@@ -1,0 +1,20 @@
+import { ObjectId } from 'mongoose';
+
+export interface IUser extends Document {
+  firstName: string;
+  secondName: string;
+  password: string;
+  resetToken: string | null;
+  email: string;
+  role: Roles;
+  orders: ObjectId[];
+  cart: ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum Roles {
+  user = 'User',
+  administrator = 'Administrator',
+  cook = 'Cook',
+}
