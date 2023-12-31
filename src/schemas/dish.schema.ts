@@ -5,6 +5,7 @@ export const DishSchema = new mongoose.Schema<IDish>({
   name: {
     type: String,
     required: [true, 'Dish name is required'],
+    unique: true,
   },
   description: {
     type: String,

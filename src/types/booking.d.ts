@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongoose';
 
-export interface IBooking extends Document {
+export interface IBooking {
   timeOfReservation: Date;
   table: ObjectId;
   amountOfVisitors: number;

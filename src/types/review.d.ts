@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongoose';
 
-export interface IReview extends Document {
+export interface IReview {
   user: ObjectId;
   rating: number;
   comment: string;

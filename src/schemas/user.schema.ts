@@ -22,6 +22,7 @@ export const UserSchema = new mongoose.Schema<IUser>(
         validator: value => /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value),
         message: props => `${props.value} is not a valid email!`,
       },
+      unique: true,
     },
     role: {
       type: String,

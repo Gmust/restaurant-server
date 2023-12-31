@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongoose';
 
-export interface ICart extends Document {
+export interface ICart {
   dishes: ObjectId[];
   totalPrice: Promise<number>;
 }

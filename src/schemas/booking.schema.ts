@@ -11,6 +11,7 @@ export const BookingSchema = new mongoose.Schema<IBooking>(
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'Table',
       required: [true, 'Table is required!'],
+      unique: true,
     },
     amountOfVisitors: {
       type: Number,

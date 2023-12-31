@@ -1,4 +1,4 @@
-export interface IIngredient extends Document {
+export interface IIngredient {
   name: string;
   quantity: number;
   unit: Units;

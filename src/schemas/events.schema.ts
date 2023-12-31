@@ -10,6 +10,7 @@ export const EventsSchema = new mongoose.Schema<IEvents>(
     name: {
       type: String,
       required: [true, 'Name is required'],
+      unique: true,
     },
     description: {
       type: String,

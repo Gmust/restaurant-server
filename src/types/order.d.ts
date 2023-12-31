@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongoose';
 
-export interface IOrder extends Document {
+export interface IOrder {
   status: Statuses;
   dishes: ObjectId[];
   totalPrice: number;

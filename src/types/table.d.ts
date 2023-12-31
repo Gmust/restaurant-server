@@ -1,4 +1,4 @@
-export interface ITable extends Document {
+export interface ITable {
   tableNum: number;
   numberOfSeats: number;
   isAvailable: boolean;

@@ -1,4 +1,4 @@
-export interface IEvents extends Document {
+export interface IEvents {
   name: string;
   description: string;
   date: Date;

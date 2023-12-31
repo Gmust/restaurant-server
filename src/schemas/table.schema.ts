@@ -5,6 +5,7 @@ export const TableSchema = new mongoose.Schema<ITable>({
   tableNum: {
     type: Number,
     required: [true, 'Table number is required'],
+    unique: true,
   },
   numberOfSeats: {
     type: Number,

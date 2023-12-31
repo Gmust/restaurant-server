@@ -5,6 +5,7 @@ export const IngredientSchema = new mongoose.Schema<IIngredient>({
   name: {
     type: String,
     required: [true, 'Ingredient string is required'],
+    unique: true,
   },
   quantity: {
     type: Number,
@@ -13,5 +14,6 @@ export const IngredientSchema = new mongoose.Schema<IIngredient>({
   unit: {
     type: String,
     enum: Object.values(Units),
+    unique: true,
   },
 });
