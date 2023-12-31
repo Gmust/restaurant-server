@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { IUser } from '../types/user';
+import { SignUpDto } from '../auth/dto/sign-up.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,9 +18,14 @@ export class UsersService {
     const user = await this.userModel.findOne({ email });
 
     if (!user) {
-      throw new HttpException('There is nu such user!', HttpStatus.NOT_FOUND);
+      throw new HttpException('Invalid credentials', HttpStatus.NOT_FOUND);
     }
 
     return user;
+  }
+
+  async createUser(user: SignUpDto) {
+    const createdUser = new this.userModel(user);
+    return createdUser.save();
   }
 }

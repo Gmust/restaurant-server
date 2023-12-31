@@ -11,6 +11,7 @@ export interface IUser {
   cart: ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  _id: string;
 }
 
 export enum Roles {
