@@ -1,26 +1,22 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { IReview } from '../types/review';
+import { Document } from 'mongoose';
 
-const schemaOptions = {
-  timestamps: { date: 'created_at', updatedAt: 'updated_at' },
-};
+export type ReviewDocument = Review & Document;
 
-export const ReviewSchema = new mongoose.Schema<IReview>(
-  {
-    user: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'User',
-      required: [true, 'User is required'],
-    },
-    rating: {
-      type: Number,
-      min: 1,
-      max: 5,
-    },
-    comment: {
-      type: String,
-      minlength: [5, 'Comment must contain at least 5 symbols'],
-    },
-  },
-  schemaOptions
-);
+@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+export class Review {
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    required: [true, 'User is required'],
+  })
+  user: mongoose.Schema.Types.ObjectId[];
+
+  @Prop({ type: Number, min: 1, max: 5 })
+  rating: number;
+
+  @Prop({ type: String, minlength: [5, 'Comment must contain at least 5 symbols'] })
+  comment: string;
+}
+
+export const ReviewSchema = SchemaFactory.createForClass(Review);

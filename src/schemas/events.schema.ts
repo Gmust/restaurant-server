@@ -1,21 +1,18 @@
-import * as mongoose from 'mongoose';
-import { IEvents } from '../types/events';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsNotEmpty } from 'class-validator';
+import { Document } from 'mongoose';
 
-const schemaOptions = {
-  timestamps: { date: 'created_at', updatedAt: 'updated_at' },
-};
+export type EventsDocument = Events & Document;
 
-export const EventsSchema = new mongoose.Schema<IEvents>(
-  {
-    name: {
-      type: String,
-      required: [true, 'Name is required'],
-      unique: true,
-    },
-    description: {
-      type: String,
-      required: [true, 'Description is required'],
-    },
-  },
-  schemaOptions
-);
+@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+export class Events {
+  @Prop({ type: String, required: [true, 'Name is required'], unique: true })
+  @IsNotEmpty({ message: 'Name is required' })
+  name: string;
+
+  @Prop({ type: String, required: [true, 'Description is required'] })
+  @IsNotEmpty({ message: 'Description is required' })
+  description: string;
+}
+
+export const EventsSchema = SchemaFactory.createForClass(Events);

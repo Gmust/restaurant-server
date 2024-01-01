@@ -1,32 +1,30 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ArrayNotEmpty, IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import * as mongoose from 'mongoose';
-import { IOrder, Statuses } from '../types/order';
+import { Document } from 'mongoose';
 
-const schemaOptions = {
-  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
-};
+import { Statuses } from '../types/order';
 
-export const OrderSchema = new mongoose.Schema<IOrder>(
-  {
-    status: {
-      type: String,
-      enum: Object.values(Statuses),
-      default: Statuses.pending,
-    },
-    dishes: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Dish',
-      validate: {
-        validator: value => value && value.length > 0,
-        message: 'At least one dish is required',
-      },
-    },
-    totalPrice: {
-      type: Number,
-      required: [true, 'Total price is required'],
-    },
-    promoCode: {
-      type: mongoose.Schema.Types.ObjectId,
-    },
-  },
-  schemaOptions
-);
+export type OrderDocument = Order & Document;
+
+@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+export class Order {
+  @Prop({ type: String, enum: Object.values(Statuses), default: Statuses.pending })
+  @IsEnum(Statuses)
+  status: string;
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dish' }] })
+  @ArrayNotEmpty({ message: 'At least one dish is required' })
+  dishes: mongoose.Schema.Types.ObjectId[];
+
+  @Prop({ type: Number, required: [true, 'Total price is required'] })
+  @IsNotEmpty({ message: 'Total price is required' })
+  @IsNumber({}, { message: 'Total price must be a number' })
+  totalPrice: number;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @IsOptional()
+  promoCode: mongoose.Schema.Types.ObjectId;
+}
+
+export const OrderSchema = SchemaFactory.createForClass(Order);

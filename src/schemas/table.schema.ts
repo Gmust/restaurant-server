@@ -1,18 +1,18 @@
-import * as mongoose from 'mongoose';
-import { ITable } from '../types/table';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-export const TableSchema = new mongoose.Schema<ITable>({
-  tableNum: {
-    type: Number,
-    required: [true, 'Table number is required'],
-    unique: true,
-  },
-  numberOfSeats: {
-    type: Number,
-    required: [true, 'Number of seats is required'],
-  },
-  isAvailable: {
-    type: Boolean,
-    default: false,
-  },
-});
+export type TableDocument = Table & Document;
+
+@Schema()
+export class Table {
+  @Prop({ type: Number, required: [true, 'Table number is required'], unique: true })
+  tableNum: number;
+
+  @Prop({ type: Number, required: [true, 'Number of seats is required'] })
+  numberOfSeats: number;
+
+  @Prop({ type: Boolean, default: false })
+  isAvailable: boolean;
+}
+
+export const TableSchema = SchemaFactory.createForClass(Table);

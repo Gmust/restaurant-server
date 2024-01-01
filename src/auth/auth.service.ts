@@ -3,9 +3,9 @@ import { UsersService } from '../users/users.service';
 import { SignInDto } from './dto/sign-in.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { IUser } from '../types/user';
 import * as process from 'process';
 import { SignUpDto } from './dto/sign-up.dto';
+import { User } from '../schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
     }
 
     const access_token = this.generateAccessToken(user);
-    const refresh_token = this.generateRefreshToken(user._id);
+    const refresh_token = this.generateRefreshToken(String(user._id));
 
     return {
       user,
@@ -31,7 +31,7 @@ export class AuthService {
     };
   }
 
-  async generateAccessToken(user: IUser): Promise<string> {
+  async generateAccessToken(user: User): Promise<string> {
     return this.jwtService.signAsync({ user });
   }
 
@@ -43,13 +43,13 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<{ message: string } | undefined> {
-    const existingUser = this.userService.findOne(signUpDto.email);
+    const existingUser = await this.userService.findOne(signUpDto.email);
 
     if (existingUser) {
       throw new HttpException('User with this email already exists', HttpStatus.BAD_REQUEST);
     }
 
-    const createdUser = this.userService.createUser(signUpDto);
+    const createdUser = await this.userService.createUser(signUpDto);
 
     if (!createdUser) {
       throw new HttpException('Something went wrong!', HttpStatus.INTERNAL_SERVER_ERROR);

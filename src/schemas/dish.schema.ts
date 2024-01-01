@@ -1,31 +1,38 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ArrayNotEmpty, IsArray, IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import * as mongoose from 'mongoose';
-import { IDish } from '../types/dish';
+import { Document } from 'mongoose';
 
-export const DishSchema = new mongoose.Schema<IDish>({
-  name: {
-    type: String,
-    required: [true, 'Dish name is required'],
-    unique: true,
-  },
-  description: {
-    type: String,
-    required: [true, 'Description is required'],
-  },
-  isVegan: {
-    type: Boolean,
-    default: false,
-  },
-  price: {
-    type: Number,
-    required: [true, 'Price is required'],
-  },
-  ingredients: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Ingredient',
-    required: [true, 'Ingredients is required'],
-  },
-  preparationTime: {
-    type: String,
-    required: [true, 'Preparation time is required'],
-  },
-});
+export type DishDocument = Dish & Document;
+
+@Schema()
+export class Dish {
+  @Prop({ type: String, required: [true, 'Dish name is required'], unique: true })
+  @IsNotEmpty({ message: 'Dish name is required' })
+  name: string;
+
+  @Prop({ type: String, required: [true, 'Description is required'] })
+  @IsNotEmpty({ message: 'Description is required' })
+  description: string;
+
+  @Prop({ type: Boolean, default: false })
+  @IsBoolean({ message: 'isVegan must be a boolean' })
+  isVegan: boolean;
+
+  @Prop({ type: Number, required: [true, 'Price is required'] })
+  @IsNotEmpty({ message: 'Price is required' })
+  @IsNumber({}, { message: 'Price must be a number' })
+  price: number;
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient' }] })
+  @ArrayNotEmpty({ message: 'At least one ingredient is required' })
+  @IsArray({ message: 'Ingredients must be an array' })
+  ingredients: mongoose.Schema.Types.ObjectId[];
+
+  @Prop({ type: String, required: [true, 'Preparation time is required'] })
+  @IsNotEmpty({ message: 'Preparation time is required' })
+  @IsString({ message: 'Preparation time must be a string' })
+  preparationTime: string;
+}
+
+export const DishSchema = SchemaFactory.createForClass(Dish);
