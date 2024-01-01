@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import * as process from 'process';
+
+import { User } from '../schemas/user.schema';
 import { UsersService } from '../users/users.service';
 import { SignInDto } from './dto/sign-in.dto';
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import * as process from 'process';
 import { SignUpDto } from './dto/sign-up.dto';
-import { User } from '../schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -21,11 +22,19 @@ export class AuthService {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    const access_token = this.generateAccessToken(user);
-    const refresh_token = this.generateRefreshToken(String(user._id));
+    const access_token = await this.generateAccessToken(user);
+    const refresh_token = await this.generateRefreshToken(String(user._id));
 
     return {
-      user,
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        secondName: user.secondName,
+        email: user.email,
+        role: user.role,
+        cart: user.cart,
+        orders: user.orders,
+      },
       access_token,
       refresh_token,
     };
