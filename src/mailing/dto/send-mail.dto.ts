@@ -5,8 +5,5 @@ export class SendMailDto {
   email: string;
 
   @IsNotEmpty()
-  subject: string;
-
-  @IsNotEmpty()
   resetLink: string;
 }

@@ -9,7 +9,7 @@ import { User, UserDocument } from '../schemas/user.schema';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async findOne(email: string): Promise<User | null> {
+  async findOne(email: string): Promise<UserDocument | null> {
     if (!email) {
       throw new HttpException('Provide email!', HttpStatus.BAD_REQUEST);
     }

@@ -1,10 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as process from 'process';
 
+import { MailingService } from '../mailing/mailing.service';
 import { User } from '../schemas/user.schema';
 import { UsersService } from '../users/users.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 
@@ -12,7 +14,8 @@ import { SignUpDto } from './dto/sign-up.dto';
 export class AuthService {
   constructor(
     private userService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private mailingService: MailingService
   ) {}
 
   async signIn({ password, email }: SignInDto): Promise<any> {
@@ -67,5 +70,67 @@ export class AuthService {
     return {
       message: 'User successfully created!',
     };
+  }
+
+  async validateToken(token: string) {
+    return this.jwtService.verify(token);
+  }
+
+  async forgotPassword(email: string) {
+    if (!email) {
+      throw new ForbiddenException('Please provide email');
+    }
+
+    const user = await this.userService.findOne(email);
+    const resetToken = await user.createPasswordResetToken();
+    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+
+    user.resetPasswordToken = resetToken;
+
+    user.resetPasswordExpires = new Date().getTime() + 60 * 60 * 1000 * 2;
+
+    await user.save();
+
+    await this.mailingService.sendResetPasswordMail({ resetLink, email });
+
+    return {
+      message: 'Reset link has been sent to your email!',
+    };
+  }
+
+  async resetPassword({ resetToken, newPassword, email }: ResetPasswordDto) {
+    console.log(resetToken);
+    console.log(newPassword);
+    console.log(email);
+
+    const user = await this.userService.findOne(email);
+
+    if (!user) {
+      throw new ForbiddenException('Invalid email');
+    }
+
+    if (!resetToken || !user.resetPasswordToken) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      throw new ForbiddenException('Token is invalid!');
+    }
+
+    if (user.resetPasswordExpires < new Date().getTime()) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      throw new ForbiddenException('Token has expired!');
+    }
+
+    if (resetToken == user.resetPasswordToken) {
+      user.password = newPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      return {
+        message: 'Password reset successfully!',
+      };
+    }
   }
 }
