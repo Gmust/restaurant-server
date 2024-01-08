@@ -97,8 +97,14 @@ export class AuthService {
     return this.jwtService.verify(token);
   }
 
-  async getUserByToken(token: string): Promise<User | null> {
-    return this.jwtService.decode(token);
+  async getUserByToken(token: string) {
+    try {
+      const decodedToken = this.jwtService.verify(token);
+      return decodedToken.user;
+    } catch (error) {
+      throw new UnauthorizedException('Token verification failed:');
+      return null;
+    }
   }
 
   async forgotPassword(email: string) {
