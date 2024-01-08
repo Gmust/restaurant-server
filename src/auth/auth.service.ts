@@ -97,6 +97,10 @@ export class AuthService {
     return this.jwtService.verify(token);
   }
 
+  async getUserByToken(token: string): Promise<User | null> {
+    return this.jwtService.decode(token);
+  }
+
   async forgotPassword(email: string) {
     if (!email) {
       throw new ForbiddenException('Please provide email');

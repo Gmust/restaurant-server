@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseConfigService } from './config/mongooseConfigService';
 import { MailingModule } from './mailing/mailing.module';
 import { UsersModule } from './users/users.module';
+import { IngredientsModule } from './ingredients/ingredients.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
         },
       },
     }),
+    IngredientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
