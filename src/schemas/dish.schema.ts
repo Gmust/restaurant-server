@@ -33,6 +33,10 @@ export class Dish {
   @IsNotEmpty({ message: 'Preparation time is required' })
   @IsString({ message: 'Preparation time must be a string' })
   preparationTime: string;
+
+  @Prop({ type: Boolean, default: true })
+  @IsBoolean({ message: 'Is available should be a boolean type' })
+  isAvailable: boolean;
 }
 
 export const DishSchema = SchemaFactory.createForClass(Dish);

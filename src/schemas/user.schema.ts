@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
-import { IsEmail, IsEnum, IsNotEmpty } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty } from 'class-validator';
 import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
 
@@ -34,6 +34,9 @@ export class User {
   @IsNotEmpty({ message: 'Password is required!' })
   password: string;
 
+  @Prop({ default: '' })
+  confirmationToken: string;
+
   @Prop({
     type: String,
   })
@@ -50,7 +53,13 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
   orders: mongoose.Schema.Types.ObjectId[];
 
+  @Prop({ type: Boolean, default: false })
+  @IsBoolean({ message: 'Is confirmed should be boolean type' })
+  isConfirmed;
+
   createPasswordResetToken: () => Promise<string>;
+
+  createConfirmationToken: () => Promise<string>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -72,4 +81,22 @@ UserSchema.methods.createPasswordResetToken = async function () {
   this.resetPasswordExpires = new Date().getTime() + 10 * 60 * 1000;
 
   return resetToken;
+};
+
+UserSchema.methods.createConfirmationToken = async function () {
+  const generateConfirmationToken = async () => {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash('confirmToken', salt);
+      const encodedToken = encodeURIComponent(hash);
+      return encodedToken;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const confirmationToken = await generateConfirmationToken();
+  this.confirmationToken = confirmationToken;
+
+  return confirmationToken;
 };
