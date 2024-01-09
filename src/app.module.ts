@@ -8,16 +8,17 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { MongooseConfigService } from './config/mongooseConfigService';
+import { DishesModule } from './dishes/dishes.module';
+import { IngredientsModule } from './ingredients/ingredients.module';
 import { MailingModule } from './mailing/mailing.module';
 import { UsersModule } from './users/users.module';
-import { IngredientsModule } from './ingredients/ingredients.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({ useClass: MongooseConfigService }),
-    UsersModule,
     AuthModule,
+    UsersModule,
     MailingModule,
     MailerModule.forRoot({
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
@@ -30,6 +31,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
       },
     }),
     IngredientsModule,
+    DishesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

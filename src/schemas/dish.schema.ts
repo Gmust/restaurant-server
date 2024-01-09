@@ -1,7 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ArrayNotEmpty, IsArray, IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
+
+import { DishCategories } from '../types/dish';
 
 export type DishDocument = Dish & Document;
 
@@ -33,6 +43,10 @@ export class Dish {
   @IsNotEmpty({ message: 'Preparation time is required' })
   @IsString({ message: 'Preparation time must be a string' })
   preparationTime: string;
+
+  @Prop({ enum: DishCategories, required: [true, 'Provide dish category'] })
+  @IsEnum(DishCategories)
+  category: string;
 
   @Prop({ type: Boolean, default: true })
   @IsBoolean({ message: 'Is available should be a boolean type' })
