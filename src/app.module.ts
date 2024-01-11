@@ -12,6 +12,7 @@ import { DishesModule } from './dishes/dishes.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { MailingModule } from './mailing/mailing.module';
 import { UsersModule } from './users/users.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UsersModule } from './users/users.module';
     }),
     IngredientsModule,
     DishesModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

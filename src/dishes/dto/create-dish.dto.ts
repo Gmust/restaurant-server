@@ -1,4 +1,6 @@
-import { IsArray, IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+
+import { DishCategories } from '../../types/dish';
 
 export class CreateDishDto {
   @IsNotEmpty()
@@ -18,6 +20,10 @@ export class CreateDishDto {
   @IsNotEmpty()
   @IsBoolean()
   isVegan: boolean;
+
+  @IsNotEmpty()
+  @IsEnum(DishCategories)
+  category;
 
   @IsNotEmpty()
   description: string;
