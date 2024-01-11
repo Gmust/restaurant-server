@@ -7,12 +7,12 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CartModule } from './cart/cart.module';
 import { MongooseConfigService } from './config/mongooseConfigService';
 import { DishesModule } from './dishes/dishes.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { MailingModule } from './mailing/mailing.module';
 import { UsersModule } from './users/users.module';
-import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
