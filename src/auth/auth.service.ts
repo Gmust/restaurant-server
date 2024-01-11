@@ -1,13 +1,16 @@
 import {
   ForbiddenException,
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+import { CartService } from '../cart/cart.service';
 import { MailingService } from '../mailing/mailing.service';
 import { User } from '../schemas/user.schema';
 import { UsersService } from '../users/users.service';
@@ -21,7 +24,9 @@ export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
-    private mailingService: MailingService
+    private mailingService: MailingService,
+    @Inject(forwardRef(() => CartService))
+    private cartService: CartService
   ) {}
 
   async signIn({ password, email }: SignInDto): Promise<any> {
@@ -79,6 +84,11 @@ export class AuthService {
     if (!createdUser) {
       throw new HttpException('Something went wrong!', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    const newCart = await this.cartService.createCart();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-expect-error
+    createdUser.cart = newCart._id;
+    createdUser.save({ validateBeforeSave: false });
 
     const confirmationToken = await createdUser.createConfirmationToken();
     const confirmationLink = `${process.env.FRONTEND_URL}confirm-account?token=${confirmationToken}`;
