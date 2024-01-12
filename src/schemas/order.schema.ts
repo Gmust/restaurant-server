@@ -22,9 +22,12 @@ export class Order {
   @IsNumber({}, { message: 'Total price must be a number' })
   totalPrice: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'PromoCode' })
   @IsOptional()
   promoCode: mongoose.Schema.Types.ObjectId;
+
+  @Prop({ type: Boolean, required: [true, 'Please check if you would like takeaway.'] })
+  takeaway: boolean;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

@@ -13,6 +13,7 @@ import { DishesModule } from './dishes/dishes.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { MailingModule } from './mailing/mailing.module';
 import { UsersModule } from './users/users.module';
+import { PromoCodeModule } from './promo-code/promo-code.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { UsersModule } from './users/users.module';
     IngredientsModule,
     DishesModule,
     CartModule,
+    PromoCodeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
