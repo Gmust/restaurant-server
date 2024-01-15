@@ -50,8 +50,8 @@ export class User {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Cart' })
   cart: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
-  orders: mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'Order' }] })
+  orders: mongoose.Types.ObjectId[];
 
   @Prop({ type: Boolean, default: false })
   @IsBoolean({ message: 'Is confirmed should be boolean type' })

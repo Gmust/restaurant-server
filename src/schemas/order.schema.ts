@@ -13,9 +13,9 @@ export class Order {
   @IsEnum(Statuses)
   status: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dish' }] })
-  @ArrayNotEmpty({ message: 'At least one dish is required' })
-  dishes: mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'OrderItem' }] })
+  @ArrayNotEmpty({ message: 'At least one order item is required ' })
+  orderItems: mongoose.Types.ObjectId[];
 
   @Prop({ type: Number, required: [true, 'Total price is required'] })
   @IsNotEmpty({ message: 'Total price is required' })

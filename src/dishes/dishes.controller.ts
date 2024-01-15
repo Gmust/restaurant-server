@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,8 +10,16 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import path from 'path';
+import { uuid } from 'uuidv4';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -29,8 +38,35 @@ export class DishesController {
   @Role(Roles.administrator)
   @UseGuards(AuthGuard, RoleGuard)
   @Post('')
-  async createDish(@Body() createDishDto: CreateDishDto) {
-    return this.dishesService.createDish(createDishDto);
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './dishes/images',
+        filename: (req, file, callback) => {
+          const filename = path.parse(file.originalname).name.replace(/\s/g, '') + uuid();
+          const extension = path.parse(file.originalname).ext;
+          callback(null, `${filename}${extension}`);
+        },
+      }),
+    })
+  )
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    })
+  )
+  async createDish(
+    @UploadedFile() image: Express.Multer.File,
+    @Body() createDishDto: CreateDishDto
+  ) {
+    if (!image) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    return this.dishesService.createDish({ createDishDto, image });
   }
 
   @HttpCode(HttpStatus.OK)

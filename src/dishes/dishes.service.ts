@@ -17,8 +17,14 @@ import { UpdateDishDto } from './dto/update-dish.dto';
 export class DishesService {
   constructor(@InjectModel(Dish.name) private dishModel: Model<Dish>) {}
 
-  async createDish(createDishDto: CreateDishDto) {
-    const newDish = await this.dishModel.create(createDishDto);
+  async createDish({
+    createDishDto,
+    image,
+  }: {
+    createDishDto: CreateDishDto;
+    image: Express.Multer.File;
+  }) {
+    const newDish = await this.dishModel.create({ ...createDishDto, image: image.filename });
 
     if (!newDish) {
       throw new ForbiddenException('Something went wrong with creating dish file!');
@@ -75,7 +81,6 @@ export class DishesService {
     if (updateDishDto.isAvailable !== undefined) {
       dish.isAvailable = updateDishDto.isAvailable;
     }
-
     const updatedDish = await dish.save({ validateBeforeSave: false });
 
     return updatedDish;

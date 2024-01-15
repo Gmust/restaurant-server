@@ -4,6 +4,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { google } from 'googleapis';
 
 import { SendMailDto } from './dto/send-mail.dto';
+import { SendMailDocumentDto } from './dto/send-mail-document.dto';
 
 @Injectable()
 export class MailingService {
@@ -53,7 +54,7 @@ export class MailingService {
     await this.mailerService.sendMail({
       transporterName: 'gmail',
       to: email,
-      from: 'noreply@nestjs.com',
+      from: '4orgood@gmail.com',
       subject: 'Password Reset',
       template: 'reset-password-template',
       context: {
@@ -75,6 +76,24 @@ export class MailingService {
         email,
         confirmationLink,
       },
+    });
+  }
+
+  public async sentOrderDocument({ email, document }: SendMailDocumentDto) {
+    await this.setTransport();
+
+    const attachment = {
+      filename: 'order_document.pdf',
+      content: Buffer.from(document),
+    };
+
+    await this.mailerService.sendMail({
+      transporterName: 'gmail',
+      to: email,
+      from: '4orgood@gmail.com',
+      subject: 'Order document',
+      attachments: [attachment],
+      template: 'test-template',
     });
   }
 }

@@ -51,6 +51,9 @@ export class Dish {
   @Prop({ type: Boolean, default: true })
   @IsBoolean({ message: 'Is available should be a boolean type' })
   isAvailable: boolean;
+
+  @Prop({ type: String, required: [true, 'Dish image is required'] })
+  image: string;
 }
 
 export const DishSchema = SchemaFactory.createForClass(Dish);

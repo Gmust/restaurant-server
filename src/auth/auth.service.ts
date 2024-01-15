@@ -88,7 +88,6 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-expect-error
     createdUser.cart = newCart._id;
-    createdUser.save({ validateBeforeSave: false });
 
     const confirmationToken = await createdUser.createConfirmationToken();
     const confirmationLink = `${process.env.FRONTEND_URL}confirm-account?token=${confirmationToken}`;

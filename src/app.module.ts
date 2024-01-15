@@ -12,8 +12,9 @@ import { MongooseConfigService } from './config/mongooseConfigService';
 import { DishesModule } from './dishes/dishes.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { MailingModule } from './mailing/mailing.module';
-import { UsersModule } from './users/users.module';
+import { OrdersModule } from './orders/orders.module';
 import { PromoCodeModule } from './promo-code/promo-code.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { PromoCodeModule } from './promo-code/promo-code.module';
     DishesModule,
     CartModule,
     PromoCodeModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
