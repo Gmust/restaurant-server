@@ -191,4 +191,14 @@ export class AuthService {
       message: 'Account successfully confirmed!',
     };
   }
+
+  async parseJwt(token) {
+    const t = String(token);
+    return JSON.parse(Buffer.from(t.split('.')[1], 'base64').toString());
+  }
+
+  async getUserByTokenData(token: string) {
+    const parsedTokenData = await this.parseJwt(token);
+    return this.userService.findOne(parsedTokenData.user.email);
+  }
 }

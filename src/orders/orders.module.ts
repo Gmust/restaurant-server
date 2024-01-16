@@ -9,6 +9,7 @@ import { Order, OrderSchema } from '../schemas/order.schema';
 import { OrderItem, OrderItemSchema } from '../schemas/orderItem.schema';
 import { UsersModule } from '../users/users.module';
 import { OrdersController } from './orders.controller';
+import { OrdersGateway } from './orders.gateway';
 import { OrdersService } from './orders.service';
 
 @Module({
@@ -23,7 +24,7 @@ import { OrdersService } from './orders.service';
     MailingModule,
     CartModule,
   ],
-  providers: [OrdersService],
+  providers: [OrdersService, OrdersGateway],
   controllers: [OrdersController],
 })
 export class OrdersModule {}

@@ -13,6 +13,7 @@ import { OrderItem } from '../schemas/orderItem.schema';
 import { UsersService } from '../users/users.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GenerateOrderDocumentDto } from './dto/generate-order-document.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Injectable()
 export class OrdersService {
@@ -57,48 +58,37 @@ export class OrdersService {
 
     if (promoCode) {
       const promoCodeDb = await this.promoCodeService.getPromoCode(promoCode);
-      const newPrice = userCart.totalPrice * (promoCodeDb.discountValue / 100);
-
-      const newOrder = await this.orderModel.create({
-        promoCode,
-        totalPrice: newPrice,
-        orderItems,
-        takeaway,
-      });
-
-      return {
-        newOrder,
-        message: 'A new order has been created and the document has been sent to your email!',
-      };
-    } else {
-      const orderDoc = await this.generateOrderDocument({
-        email,
-        totalPrice: userCart.totalPrice,
-        orderItems,
-      });
-
-      if (!orderDoc) {
-        throw new InternalServerErrorException('Something went wrong!');
-      }
-      await this.mailerService.sentOrderDocument({ email, document: orderDoc });
-
-      const newOrder = await this.orderModel.create({
-        totalPrice: userCart.totalPrice,
-        takeaway,
-      });
-
-      if (!newOrder) {
-        throw new InternalServerErrorException('Something went wrong!');
-      }
-
-      user.orders.push(newOrder._id);
-      await user.save({ validateBeforeSave: false });
-
-      return {
-        newOrder,
-        message: 'A new order has been created and the document has been sent to your email!',
-      };
+      userCart.totalPrice = userCart.totalPrice * (promoCodeDb.discountValue / 100);
+      await userCart.save({ validateBeforeSave: false });
     }
+    const orderDoc = await this.generateOrderDocument({
+      email,
+      totalPrice: userCart.totalPrice,
+      orderItems,
+    });
+
+    if (!orderDoc) {
+      throw new InternalServerErrorException('Something went wrong!');
+    }
+    await this.mailerService.sentOrderDocument({ email, document: orderDoc });
+
+    const newOrder = await this.orderModel.create({
+      totalPrice: userCart.totalPrice,
+      orderItems,
+      takeaway,
+    });
+
+    if (!newOrder) {
+      throw new InternalServerErrorException('Something went wrong!');
+    }
+
+    user.orders.push(newOrder._id);
+    await user.save({ validateBeforeSave: false });
+
+    return {
+      newOrder,
+      message: 'A new order has been created and the document has been sent to your email!',
+    };
   }
 
   private async generateOrderDocument({ email, totalPrice, orderItems }: GenerateOrderDocumentDto) {
@@ -181,5 +171,20 @@ export class OrdersService {
 
       pdfDocument.end();
     });
+  }
+
+  public async updateOrderStatus({ orderId, newStatus, userId }: UpdateOrderStatusDto) {
+    const order = await this.orderModel.findById(orderId);
+
+    if (!order) {
+      throw new BadRequestException('Invalid order id!');
+    }
+    order.status = newStatus;
+    order.save({ validateBeforeSave: false });
+    return {
+      orderId: orderId,
+      newStatus: newStatus,
+      userId,
+    };
   }
 }
