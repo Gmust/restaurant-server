@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { AuthService } from '../auth.service';
@@ -22,6 +22,11 @@ export class RoleGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const { authorization }: any = request.headers;
+
+    if (!authorization) {
+      throw new UnauthorizedException('Provide  token');
+    }
+
     const authToken = authorization.replace(/bearer/gim, '').trim();
 
     const user = await this.authService.getUserByToken(authToken);

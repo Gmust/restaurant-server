@@ -16,6 +16,7 @@ import { OrdersGateway } from './orders/orders.gateway';
 import { OrdersModule } from './orders/orders.module';
 import { PromoCodeModule } from './promo-code/promo-code.module';
 import { UsersModule } from './users/users.module';
+import { TablesModule } from './tables/tables.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
     CartModule,
     PromoCodeModule,
     OrdersModule,
+    TablesModule,
   ],
   controllers: [AppController],
   providers: [AppService, OrdersGateway],
