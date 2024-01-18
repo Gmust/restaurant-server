@@ -13,7 +13,11 @@ export class Order {
   @IsEnum(Statuses)
   status: string;
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
+  @Prop({
+    type: mongoose.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'User, who ordered is required'],
+  })
   user: string;
 
   @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'OrderItem' }] })

@@ -17,6 +17,13 @@ export class UsersService {
     return this.userModel.findOne({ email });
   }
 
+  async findById(id: string): Promise<UserDocument | null> {
+    if (!id) {
+      throw new HttpException('Provide email!', HttpStatus.BAD_REQUEST);
+    }
+    return this.userModel.findById(id);
+  }
+
   async createUser(userDto: SignUpDto): Promise<UserDocument> {
     const newUser = new this.userModel(userDto);
     return newUser.save();

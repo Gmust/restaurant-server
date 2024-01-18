@@ -11,6 +11,7 @@ import { PromoCodeService } from '../promo-code/promo-code.service';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { OrderItem } from '../schemas/orderItem.schema';
 import { UsersService } from '../users/users.service';
+import { CompleteOrderDto } from './dto/complete-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GenerateOrderDocumentDto } from './dto/generate-order-document.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -36,8 +37,8 @@ export class OrdersService {
       throw new BadRequestException('Order can`t be created in the past');
     }
 
-    const user = await this.usersService.findOne(email);
-    const userCart = await this.cartService.getCart(String(user.cart));
+    const userBD = await this.usersService.findOne(email);
+    const userCart = await this.cartService.getCart(String(userBD.cart));
     const orderItems: OrderItem[] | null = [];
 
     for (const cartItem of userCart.cartItems) {
@@ -53,7 +54,7 @@ export class OrdersService {
     }
 
     if (orderItems.length < 1) {
-      throw new InternalServerErrorException('Something went wrong!');
+      throw new BadRequestException('Please add dishes to your cart');
     }
 
     if (promoCode) {
@@ -72,18 +73,24 @@ export class OrdersService {
     }
     await this.mailerService.sentOrderDocument({ email, document: orderDoc });
 
+    userCart.totalPrice = 0;
+    userCart.cartItems = [];
+
+    userCart.save({ validateBeforeSave: false });
+
     const newOrder = await this.orderModel.create({
       totalPrice: userCart.totalPrice,
       orderItems,
       takeaway,
+      user: userBD,
     });
 
     if (!newOrder) {
       throw new InternalServerErrorException('Something went wrong!');
     }
 
-    user.orders.push(newOrder._id);
-    await user.save({ validateBeforeSave: false });
+    userBD.orders.push(newOrder._id);
+    await userBD.save({ validateBeforeSave: false });
 
     return {
       newOrder,
@@ -185,6 +192,20 @@ export class OrdersService {
       orderId: orderId,
       newStatus: newStatus,
       userId,
+    };
+  }
+
+  public async completeOrder({ orderId }: CompleteOrderDto) {
+    const order = await this.orderModel.findById(orderId);
+    const user = await this.usersService.findById(order.user);
+
+    user.orders = user.orders.filter(order => String(order.id) == String(orderId));
+    await user.save({ validateBeforeSave: false });
+
+    await this.orderModel.findByIdAndDelete(orderId);
+
+    return {
+      message: 'Order Successfully completed!',
     };
   }
 }
