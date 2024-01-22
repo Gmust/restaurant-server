@@ -71,7 +71,12 @@ export class OrdersService {
     if (!orderDoc) {
       throw new InternalServerErrorException('Something went wrong!');
     }
-    await this.mailerService.sentOrderDocument({ email, document: orderDoc });
+    await this.mailerService.sentMailWithAttachment({
+      email,
+      document: orderDoc,
+      subject: 'Order',
+      template: 'test-template',
+    });
 
     userCart.totalPrice = 0;
     userCart.cartItems = [];

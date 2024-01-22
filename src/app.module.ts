@@ -17,6 +17,7 @@ import { OrdersModule } from './orders/orders.module';
 import { PromoCodeModule } from './promo-code/promo-code.module';
 import { UsersModule } from './users/users.module';
 import { TablesModule } from './tables/tables.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { TablesModule } from './tables/tables.module';
     PromoCodeModule,
     OrdersModule,
     TablesModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [AppService, OrdersGateway],

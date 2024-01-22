@@ -79,7 +79,7 @@ export class MailingService {
     });
   }
 
-  public async sentOrderDocument({ email, document }: SendMailDocumentDto) {
+  public async sentMailWithAttachment({ email, document, template, subject }: SendMailDocumentDto) {
     await this.setTransport();
 
     const attachment = {
@@ -91,9 +91,9 @@ export class MailingService {
       transporterName: 'gmail',
       to: email,
       from: '4orgood@gmail.com',
-      subject: 'Order document',
+      subject: subject,
       attachments: [attachment],
-      template: 'test-template',
+      template: template,
     });
   }
 }

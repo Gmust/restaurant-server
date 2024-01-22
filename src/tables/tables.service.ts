@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { Table } from '../schemas/table.schema';
+import { Table, TableDocument } from '../schemas/table.schema';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 
@@ -50,5 +50,14 @@ export class TablesService {
     return {
       message: 'Table successfully deleted',
     };
+  }
+
+  async getTableByNum(tableNum: number): Promise<TableDocument | null> {
+    const table = await this.tableModel.findOne({ tableNum });
+    if (!table) {
+      throw new NotFoundException('Invalid table number');
+    } else {
+      return table;
+    }
   }
 }

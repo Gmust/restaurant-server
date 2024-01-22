@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class SendMailDocumentDto {
   @IsNotEmpty()
@@ -7,4 +7,10 @@ export class SendMailDocumentDto {
 
   @IsNotEmpty()
   document: Buffer;
+
+  @IsNotEmpty()
+  subject: string;
+
+  @IsOptional()
+  template: string;
 }
