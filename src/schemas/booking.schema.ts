@@ -8,11 +8,12 @@ export type BookingDocument = Booking & Document;
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Booking {
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Table' }],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Table',
     required: [true, 'Table is required!'],
     unique: true,
   })
-  table: mongoose.Schema.Types.ObjectId[];
+  table: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: Number, required: [true, 'Amount of visitors is required'] })
   amountOfVisitors: number;

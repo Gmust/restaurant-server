@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 import { google } from 'googleapis';
 
+import { SendConfirmMailDto } from './dto/send-confirm-mail.dto';
 import { SendMailDto } from './dto/send-mail.dto';
 import { SendMailDocumentDto } from './dto/send-mail-document.dto';
 
@@ -64,17 +65,17 @@ export class MailingService {
     });
   }
 
-  public async sentConfirmationEmail({ confirmationLink, email }) {
+  public async sentConfirmationMail({ subject, template, link, email }: SendConfirmMailDto) {
     await this.setTransport();
     await this.mailerService.sendMail({
       transporterName: 'gmail',
       to: email,
       from: 'noreply@nestjs.com',
-      subject: 'Email confirmation',
-      template: 'account-confirmation-template',
+      subject: subject,
+      template: template,
       context: {
         email,
-        confirmationLink,
+        link,
       },
     });
   }
@@ -96,4 +97,6 @@ export class MailingService {
       template: template,
     });
   }
+
+  public async sentReservationConfirmMail({}) {}
 }

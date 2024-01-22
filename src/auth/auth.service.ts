@@ -95,7 +95,12 @@ export class AuthService {
     createdUser.confirmationToken = confirmationToken;
     await createdUser.save();
 
-    await this.mailingService.sentConfirmationEmail({ confirmationLink, email: createdUser.email });
+    await this.mailingService.sentConfirmationMail({
+      link: confirmationLink,
+      email: createdUser.email,
+      subject: 'Account confirmation',
+      template: 'account-confirmation-template',
+    });
 
     return {
       message: 'User successfully created! Confirmation link sent to your email!',

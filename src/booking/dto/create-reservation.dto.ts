@@ -7,11 +7,11 @@ export class CreateReservationDto {
 
   @IsNotEmpty()
   @IsNumber()
-  table;
+  table: number;
 
   @IsNotEmpty()
   @IsNumber()
-  amountOfVisitors;
+  amountOfVisitors: number;
 
   @IsNumber()
   @IsEmail()
