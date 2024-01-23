@@ -21,6 +21,7 @@ import { AuthService } from './auth.service';
       }),
     }),
     forwardRef(() => CartModule),
+    forwardRef(() => UsersModule),
   ],
   controllers: [AuthController],
   providers: [AuthService],

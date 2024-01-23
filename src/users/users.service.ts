@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -33,5 +33,14 @@ export class UsersService {
     return newUser.save();
   }
 
-  //TODO create receiving news service
+  async changeReceivingNews({ userId, receiveNews }: { userId: string; receiveNews: boolean }) {
+    const user = await this.userModel.findById(userId);
+    if (user.receiveNews === receiveNews) {
+      throw new BadRequestException('User already doing it');
+    }
+
+    user.receiveNews = receiveNews;
+    user.save({ validateBeforeSave: false });
+    return user;
+  }
 }
