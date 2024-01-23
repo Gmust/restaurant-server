@@ -55,6 +55,7 @@ export class AuthService {
         role: user.role,
         cart: user.cart,
         orders: user.orders,
+        receiveNews: user.receiveNews,
       },
       access_token,
       refresh_token,
@@ -95,7 +96,7 @@ export class AuthService {
     createdUser.confirmationToken = confirmationToken;
     await createdUser.save();
 
-    await this.mailingService.sentConfirmationMail({
+    await this.mailingService.sendConfirmationMail({
       link: confirmationLink,
       email: createdUser.email,
       subject: 'Account confirmation',

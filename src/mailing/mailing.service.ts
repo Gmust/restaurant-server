@@ -4,6 +4,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { google } from 'googleapis';
 
 import { SendConfirmMailDto } from './dto/send-confirm-mail.dto';
+import { SendEventMailDto } from './dto/send-event-mail.dto';
 import { SendMailDto } from './dto/send-mail.dto';
 import { SendMailDocumentDto } from './dto/send-mail-document.dto';
 
@@ -65,7 +66,7 @@ export class MailingService {
     });
   }
 
-  public async sentConfirmationMail({ subject, template, link, email }: SendConfirmMailDto) {
+  public async sendConfirmationMail({ subject, template, link, email }: SendConfirmMailDto) {
     await this.setTransport();
     await this.mailerService.sendMail({
       transporterName: 'gmail',
@@ -80,7 +81,7 @@ export class MailingService {
     });
   }
 
-  public async sentMailWithAttachment({ email, document, template, subject }: SendMailDocumentDto) {
+  public async sendMailWithAttachment({ email, document, template, subject }: SendMailDocumentDto) {
     await this.setTransport();
 
     const attachment = {
@@ -98,5 +99,21 @@ export class MailingService {
     });
   }
 
-  public async sentReservationConfirmMail({}) {}
+  public async sendEventMail({ subject, template, email, eventDescription }: SendEventMailDto) {
+    await this.setTransport();
+
+    await this.mailerService.sendMail({
+      transporterName: 'gmail',
+      to: email,
+      from: '4orgood@gmail.com',
+      subject: subject,
+      template: template,
+      context: {
+        email,
+        eventDescription,
+      },
+    });
+  }
+
+  //TODO create service for different notification mails
 }

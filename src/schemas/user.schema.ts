@@ -57,6 +57,12 @@ export class User {
   @IsBoolean({ message: 'Is confirmed should be boolean type' })
   isConfirmed;
 
+  @Prop({
+    type: Boolean,
+    required: [true, 'Please check if you want to receive news about events'],
+  })
+  receiveNews: boolean;
+
   createPasswordResetToken: () => Promise<string>;
 
   createConfirmationToken: () => Promise<string>;

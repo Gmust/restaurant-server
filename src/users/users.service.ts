@@ -9,6 +9,10 @@ import { User, UserDocument } from '../schemas/user.schema';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+  async getAllWithNews() {
+    return this.userModel.find({ receiveNews: true });
+  }
+
   async findOne(email: string): Promise<UserDocument | null> {
     if (!email) {
       throw new HttpException('Provide email!', HttpStatus.BAD_REQUEST);
@@ -28,4 +32,6 @@ export class UsersService {
     const newUser = new this.userModel(userDto);
     return newUser.save();
   }
+
+  //TODO create receiving news service
 }

@@ -71,7 +71,7 @@ export class OrdersService {
     if (!orderDoc) {
       throw new InternalServerErrorException('Something went wrong!');
     }
-    await this.mailerService.sentMailWithAttachment({
+    await this.mailerService.sendMailWithAttachment({
       email,
       document: orderDoc,
       subject: 'Order',
