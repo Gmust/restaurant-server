@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { hash } from 'bcrypt';
 
 import { AuthModule } from '../auth/auth.module';
+import { MailingModule } from '../mailing/mailing.module';
 import { User, UserSchema } from '../schemas/user.schema';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -10,6 +11,7 @@ import { UsersService } from './users.service';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
+    MailingModule,
     MongooseModule.forFeatureAsync([
       {
         name: User.name,

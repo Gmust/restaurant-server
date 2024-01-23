@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 import { google } from 'googleapis';
 
+import { SendNotificationDto } from '../events/dto/send-notification.dto';
 import { SendConfirmMailDto } from './dto/send-confirm-mail.dto';
 import { SendEventMailDto } from './dto/send-event-mail.dto';
 import { SendMailDto } from './dto/send-mail.dto';
@@ -115,5 +116,7 @@ export class MailingService {
     });
   }
 
-  //TODO create service for different notification mails
+  async sendNotification({ subject, email, message }: SendNotificationDto) {
+    await this.setTransport();
+  }
 }

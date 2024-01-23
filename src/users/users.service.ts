@@ -3,11 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { SignUpDto } from '../auth/dto/sign-up.dto';
+import { MailingService } from '../mailing/mailing.service';
 import { User, UserDocument } from '../schemas/user.schema';
+import { NotificateUsersDto } from './dto/notificate-users.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private mailingService: MailingService
+  ) {}
 
   async getAllWithNews() {
     return this.userModel.find({ receiveNews: true });
@@ -42,5 +47,27 @@ export class UsersService {
     user.receiveNews = receiveNews;
     user.save({ validateBeforeSave: false });
     return user;
+  }
+
+  async notificateUsers({ message, subject, role }: NotificateUsersDto) {
+    const usersWithRole = await this.userModel.find({ role });
+
+    for (const user of usersWithRole) {
+      try {
+        await this.mailingService.sendNotification({
+          email: user.email,
+          subject,
+          message,
+          template: 'notification',
+        });
+        console.log(`Email sent successfully to ${user.email}`);
+      } catch (error) {
+        console.error(`Failed to send email to ${user.email}: ${error.message}`);
+      }
+    }
+
+    return {
+      message: `Notification has been successfully to ${role}'s`,
+    };
   }
 }
