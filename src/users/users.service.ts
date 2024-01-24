@@ -28,7 +28,7 @@ export class UsersService {
 
   async findById(id: string): Promise<UserDocument | null> {
     if (!id) {
-      throw new HttpException('Provide email!', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Provide user id!', HttpStatus.BAD_REQUEST);
     }
     return this.userModel.findById(id);
   }

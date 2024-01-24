@@ -57,6 +57,9 @@ export class User {
   @IsBoolean({ message: 'Is confirmed should be boolean type' })
   isConfirmed;
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Review', required: false })
+  review: mongoose.Types.ObjectId;
+
   @Prop({
     type: Boolean,
     required: [true, 'Please check if you want to receive news about events'],

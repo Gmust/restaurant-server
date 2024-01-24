@@ -7,8 +7,10 @@ export type ReviewDocument = Review & Document;
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Review {
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: [true, 'User is required'],
+    unique: [true, 'User can have only 1 review'],
   })
   user: mongoose.Schema.Types.ObjectId[];
 
@@ -16,7 +18,7 @@ export class Review {
   rating: number;
 
   @Prop({ type: String, minlength: [5, 'Comment must contain at least 5 symbols'] })
-  comment: string;
+  reviewComment: string;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

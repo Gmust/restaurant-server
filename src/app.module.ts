@@ -20,6 +20,7 @@ import { PromoCodeModule } from './promo-code/promo-code.module';
 import { TablesModule } from './tables/tables.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { EventsModule } from './events/events.module';
     TablesModule,
     BookingModule,
     EventsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService, OrdersGateway],
