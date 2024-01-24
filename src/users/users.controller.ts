@@ -5,6 +5,7 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 
@@ -34,7 +35,7 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @Role(Roles.administrator)
   @UseGuards(AuthGuard, RoleGuard)
-  @Patch('change-receive-news')
+  @Post('send-notification')
   async notificateUsers(@Body() notificateUserDto: NotificateUsersDto) {
     try {
       return this.usersService.notificateUsers(notificateUserDto);

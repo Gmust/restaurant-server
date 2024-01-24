@@ -116,7 +116,19 @@ export class MailingService {
     });
   }
 
-  async sendNotification({ subject, email, message }: SendNotificationDto) {
+  async sendNotification({ subject, email, message, template }: SendNotificationDto) {
     await this.setTransport();
+
+    await this.mailerService.sendMail({
+      transporterName: 'gmail',
+      to: email,
+      from: '4orgood@gmail.com',
+      subject: subject,
+      template: template,
+      context: {
+        email,
+        message,
+      },
+    });
   }
 }

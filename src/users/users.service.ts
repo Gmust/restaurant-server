@@ -58,7 +58,7 @@ export class UsersService {
           email: user.email,
           subject,
           message,
-          template: 'notification',
+          template: 'notification-template',
         });
         console.log(`Email sent successfully to ${user.email}`);
       } catch (error) {
