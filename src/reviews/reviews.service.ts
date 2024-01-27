@@ -73,8 +73,7 @@ export class ReviewsService {
     const pageTotal = Math.floor((reviewsCount - 1) / limit) + 1;
 
     let data;
-    console.log(newFirst);
-    console.log(oldFirst);
+
     if (newFirst) {
       data = await this.reviewModel
         .find({})
