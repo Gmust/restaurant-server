@@ -11,7 +11,7 @@ async function bootstrap() {
     .setTitle('Restaurant api')
     .setDescription('Api for restaurant app')
     .setVersion('1.0')
-    .addServer('http://localhost:8080/', 'Local environment')
+    .addServer(process.env.BACKEND_DEV_URL, 'Local environment')
     .addTag('api')
     .build();
   const document = SwaggerModule.createDocument(app, options);
