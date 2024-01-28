@@ -9,6 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -53,10 +54,7 @@ export class PromoCodeController {
     return this.promoCodeService.deletePromoCode(params.promoCodeId);
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Role(Roles.administrator)
-  @UseGuards(AuthGuard, RoleGuard)
-  @Delete('/delete-all-expired')
+  @Cron(CronExpression.EVERY_DAY_AT_11PM)
   async deleteAllExpiredPromoCodes() {
     return this.promoCodeService.deleteAllExpiredPromoCodes();
   }
