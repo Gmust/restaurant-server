@@ -11,6 +11,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -21,6 +22,7 @@ import { UpdateTableDto } from './dto/update-table.dto';
 import { TablesService } from './tables.service';
 
 @Controller('tables')
+@ApiTags('Tables')
 export class TablesController {
   constructor(private tablesService: TablesService) {}
 

@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -22,6 +23,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { EventsService } from './events.service';
 
 @Controller('events')
+@ApiTags('Events')
 export class EventsController {
   constructor(private eventsService: EventsService) {}
 

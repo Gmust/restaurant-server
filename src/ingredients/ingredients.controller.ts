@@ -10,6 +10,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -20,6 +21,7 @@ import { UpdateIngredientDto } from './dto/update-ingredient.dto';
 import { IngredientsService } from './ingredients.service';
 
 @Controller('ingredients')
+@ApiTags('Ingredients')
 export class IngredientsController {
   constructor(private ingredientsService: IngredientsService) {}
 

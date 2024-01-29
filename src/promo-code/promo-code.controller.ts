@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -19,6 +20,7 @@ import { CreatePromoDto } from './dto/create-promo.dto';
 import { PromoCodeService } from './promo-code.service';
 
 @Controller('promo-code')
+@ApiTags('Promo codes')
 export class PromoCodeController {
   constructor(private promoCodeService: PromoCodeService) {}
 

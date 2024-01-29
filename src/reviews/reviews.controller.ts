@@ -12,6 +12,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -20,6 +21,7 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewsService } from './reviews.service';
 
 @Controller('reviews')
+@ApiTags('Reviews')
 export class ReviewsController {
   constructor(private reviewsService: ReviewsService) {}
 

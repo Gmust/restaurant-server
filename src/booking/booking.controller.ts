@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -23,6 +24,7 @@ import { ConfirmReservationDto } from './dto/confirm-reservation.dto';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 
 @Controller('booking')
+@ApiTags('Booking')
 export class BookingController {
   constructor(private bookingService: BookingService) {}
 

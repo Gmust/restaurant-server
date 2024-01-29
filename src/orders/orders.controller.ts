@@ -9,6 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -21,6 +22,7 @@ import { OrdersGateway } from './orders.gateway';
 import { OrdersService } from './orders.service';
 
 @Controller('orders')
+@ApiTags('Orders')
 export class OrdersController {
   constructor(
     private orderService: OrdersService,

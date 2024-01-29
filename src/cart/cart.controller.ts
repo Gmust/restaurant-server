@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CartService } from './cart.service';
@@ -16,6 +17,7 @@ import { ChangeQuantityDto } from './dto/change-quantity.dto';
 import { RemoveFromCartDto } from './dto/remove-from-cart.dto';
 
 @Controller('cart')
+@ApiTags('Cart')
 export class CartController {
   constructor(private cartService: CartService) {}
 

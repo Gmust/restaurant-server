@@ -91,7 +91,7 @@ export class AuthService {
     createdUser.cart = newCart._id;
 
     const confirmationToken = await createdUser.createConfirmationToken();
-    const confirmationLink = `${process.env.FRONTEND_URL}confirm-account?token=${confirmationToken}`;
+    const confirmationLink = `${process.env.FRONTEND_URL}/confirm-account?token=${confirmationToken}`;
 
     createdUser.confirmationToken = confirmationToken;
     await createdUser.save();

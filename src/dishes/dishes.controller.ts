@@ -17,6 +17,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import path from 'path';
 import { uuid } from 'uuidv4';
@@ -31,6 +32,7 @@ import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 
 @Controller('dishes')
+@ApiTags('Dishes')
 export class DishesController {
   constructor(private dishesService: DishesService) {}
 
