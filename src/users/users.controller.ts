@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -18,6 +19,7 @@ import { NotificateUsersDto } from './dto/notificate-users.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
+@ApiTags('Users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
