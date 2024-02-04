@@ -110,4 +110,23 @@ export class EventsService {
   async getAllEvents() {
     return this.eventsModel.find();
   }
+
+  private getNextWeekDate(): Date {
+    const date = new Date();
+    return new Date(date.setDate(date.getDate() + 7));
+  }
+
+  // Get events that will happen in 7 days or earlier
+  async getClosestEvents() {
+    const dateToFilter = this.getNextWeekDate();
+
+    return this.eventsModel.find({ startDate: { $lt: dateToFilter.toISOString() } });
+  }
+
+  // Get events in 7 days or later
+  async getNearestEvents() {
+    const dateToFilter = this.getNextWeekDate();
+
+    return this.eventsModel.find({ startDate: { $gt: dateToFilter.toISOString() } });
+  }
 }

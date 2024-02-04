@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,14 +9,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Dish } from '../schemas/dish.schema';
+import { Specialties } from '../schemas/specialties.schema';
 import { GetDishesInterface } from '../types/dish';
 import { dishMessages } from '../utils/constants';
 import { CreateDishDto } from './dto/create-dish.dto';
+import { CreateSpecialtiesDto } from './dto/create-specialties.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 
 @Injectable()
 export class DishesService {
-  constructor(@InjectModel(Dish.name) private dishModel: Model<Dish>) {}
+  constructor(
+    @InjectModel(Dish.name) private dishModel: Model<Dish>,
+    @InjectModel(Specialties.name) private specialtiesModel: Model<Specialties>
+  ) {}
 
   async createDish({
     createDishDto,
@@ -24,16 +30,20 @@ export class DishesService {
     createDishDto: CreateDishDto;
     image: Express.Multer.File;
   }) {
-    const newDish = await this.dishModel.create({ ...createDishDto, image: image.filename });
+    try {
+      const newDish = await this.dishModel.create({ ...createDishDto, image: image.filename });
 
-    if (!newDish) {
-      throw new ForbiddenException('Something went wrong with creating dish file!');
+      if (!newDish) {
+        throw new ForbiddenException('Something went wrong with creating dish file!');
+      }
+
+      return {
+        message: 'New dish successfully created!',
+        dish: newDish,
+      };
+    } catch (e) {
+      if (e.code === 11000) throw new ConflictException('Dish with the same name already exists.');
     }
-
-    return {
-      message: 'New dish successfully created!',
-      dish: newDish,
-    };
   }
 
   async getDish(id: string) {
@@ -118,5 +128,13 @@ export class DishesService {
       data,
       pageTotal,
     };
+  }
+
+  async createSpecialtiesMenu({ specialties }: CreateSpecialtiesDto) {
+    return this.specialtiesModel.create({ specialties: specialties });
+  }
+
+  async getSpecialtiesMenu() {
+    return this.specialtiesModel.find().populate('specialties');
   }
 }

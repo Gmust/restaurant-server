@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
@@ -29,6 +30,7 @@ import { GetDishesInterface } from '../types/dish';
 import { Roles } from '../types/user';
 import { DishesService } from './dishes.service';
 import { CreateDishDto } from './dto/create-dish.dto';
+import { CreateSpecialtiesDto } from './dto/create-specialties.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 
 @Controller('dishes')
@@ -72,7 +74,7 @@ export class DishesController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get(':id')
+  @Get('/dish/:id')
   async getDish(@Param() params: { id: string }) {
     return this.dishesService.getDish(params.id);
   }
@@ -97,5 +99,27 @@ export class DishesController {
   @Get('')
   async getAllDishes(@Query() { limit, skip, isVegan, category }: GetDishesInterface) {
     return this.dishesService.getAllDishes({ skip, limit, isVegan, category });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Role(Roles.administrator)
+  @UseGuards(RoleGuard, AuthGuard)
+  @Post('/create-specialties-menu')
+  async createSpecialtiesMenu(@Body() createSpecialtiesDto: CreateSpecialtiesDto) {
+    try {
+      return this.dishesService.createSpecialtiesMenu(createSpecialtiesDto);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/specialties-menu')
+  async getSpecialtiesMenu() {
+    try {
+      return this.dishesService.getSpecialtiesMenu();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
   }
 }

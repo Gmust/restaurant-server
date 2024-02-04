@@ -64,7 +64,7 @@ export class EventsController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get(':id')
+  @Get('event/:id')
   async getEvent(@Param() params: { id: string }) {
     try {
       return this.eventsService.findEvent(params.id);
@@ -78,6 +78,26 @@ export class EventsController {
   async getAllEvent() {
     try {
       return this.eventsService.getAllEvents();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/closest')
+  async getClosestEvents() {
+    try {
+      return this.eventsService.getClosestEvents();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/nearest')
+  async getNearestEvents() {
+    try {
+      return this.eventsService.getNearestEvents();
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
