@@ -54,6 +54,9 @@ export class Dish {
 
   @Prop({ type: String, required: [true, 'Dish image is required'] })
   image: string;
+
+  @Prop({ type: Number, requires: [true, 'Dish weight is required'] })
+  dishWeight: number;
 }
 
 export const DishSchema = SchemaFactory.createForClass(Dish);

@@ -37,4 +37,7 @@ export class CreateDishDto {
 
   @IsNotEmpty()
   description: string;
+
+  @IsNotEmpty()
+  dishWeight: number;
 }

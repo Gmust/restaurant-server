@@ -91,6 +91,9 @@ export class DishesService {
     if (updateDishDto.isAvailable !== undefined) {
       dish.isAvailable = updateDishDto.isAvailable;
     }
+    if (updateDishDto.dishWeight !== undefined) {
+      dish.dishWeight = updateDishDto.dishWeight;
+    }
     const updatedDish = await dish.save({ validateBeforeSave: false });
 
     return updatedDish;
