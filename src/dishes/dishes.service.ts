@@ -134,10 +134,10 @@ export class DishesService {
   }
 
   async createSpecialtiesMenu({ specialties }: CreateSpecialtiesDto) {
-    return this.specialtiesModel.create({ specialties: specialties });
+    return this.specialtiesModel.create({ specialtyDishes: specialties });
   }
 
   async getSpecialtiesMenu() {
-    return this.specialtiesModel.find().populate('specialties');
+    return this.specialtiesModel.find().populate('specialtiesDishes');
   }
 }
