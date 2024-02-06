@@ -114,6 +114,7 @@ export class DishesService {
   async getAllDishes({ skip = 0, limit = 10, isVegan, category }: GetDishesInterface) {
     const count = await this.dishModel.countDocuments();
     const pageTotal = Math.floor((count - 1) / limit) + 1;
+    const currentPage = Math.floor(skip / limit) + 1;
 
     let data;
 
@@ -129,6 +130,7 @@ export class DishesService {
 
     return {
       data,
+      currentPage,
       pageTotal,
     };
   }
