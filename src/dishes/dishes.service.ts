@@ -138,6 +138,6 @@ export class DishesService {
   }
 
   async getSpecialtiesMenu() {
-    return this.specialtiesModel.find().populate('specialtiesDishes');
+    return this.specialtiesModel.find().populate('specialtyDishes');
   }
 }
