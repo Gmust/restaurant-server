@@ -31,7 +31,10 @@ export class DishesService {
     image: Express.Multer.File;
   }) {
     try {
-      const newDish = await this.dishModel.create({ ...createDishDto, image: image.filename });
+      const newDish = await this.dishModel.create({
+        ...createDishDto,
+        image: image.filename,
+      });
 
       if (!newDish) {
         throw new ForbiddenException('Something went wrong with creating dish file!');
@@ -111,22 +114,35 @@ export class DishesService {
     };
   }
 
-  async getAllDishes({ skip = 0, limit = 10, isVegan, category }: GetDishesInterface) {
+  async getAllDishes({ skip = 0, limit, isVegan, category }: GetDishesInterface) {
     const count = await this.dishModel.countDocuments();
     const pageTotal = Math.floor((count - 1) / limit) + 1;
     const currentPage = Math.floor(skip / limit) + 1;
-
     let data;
 
     if (isVegan && category) {
-      data = await this.dishModel.find({ isVegan, category }).limit(limit).skip(skip);
+      data = await this.dishModel
+        .find({ isVegan, category })
+        .limit(limit)
+        .skip(skip * limit);
     } else if (isVegan) {
-      data = await this.dishModel.find({ isVegan }).limit(limit).skip(skip);
+      data = await this.dishModel
+        .find({ isVegan })
+        .limit(limit)
+        .skip(skip * limit);
     } else if (category) {
-      data = await this.dishModel.find({ category }).limit(limit).skip(skip);
+      data = await this.dishModel
+        .find({ category })
+        .limit(limit)
+        .skip(skip * limit);
     } else if (!isVegan && !category) {
-      data = await this.dishModel.find().limit(limit).skip(skip);
+      data = await this.dishModel
+        .find()
+        .limit(limit)
+        .skip(skip * limit);
     }
+
+    console.log(currentPage);
 
     return {
       data,
