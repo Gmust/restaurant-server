@@ -19,8 +19,6 @@ export class ReviewsService {
     try {
       const user = await this.userService.findById(userId);
       const newReview = await this.reviewModel.create({ rating, reviewComment: comment, user });
-      console.log('user', user);
-      console.log(newReview);
       user.review = newReview.id;
       await user.save({ validateBeforeSave: false });
 
@@ -29,7 +27,6 @@ export class ReviewsService {
         message: 'New review successfully posted',
       };
     } catch (e) {
-      console.log(e);
       if (e.code === 11000) throw new ConflictException('User can have only one review');
     }
   }

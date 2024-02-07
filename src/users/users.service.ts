@@ -60,7 +60,6 @@ export class UsersService {
           message,
           template: 'notification-template',
         });
-        console.log(`Email sent successfully to ${user.email}`);
       } catch (error) {
         console.error(`Failed to send email to ${user.email}: ${error.message}`);
       }

@@ -45,7 +45,6 @@ export class EventsService {
             email: user.email,
             template: 'event-template',
           });
-          console.log(`Email sent successfully to ${user.email}`);
         } catch (error) {
           console.error(`Failed to send email to ${user.email}: ${error.message}`);
         }

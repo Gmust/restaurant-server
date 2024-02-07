@@ -32,7 +32,6 @@ export class ReviewsController {
     try {
       return this.reviewsService.createReview(createReviewDto);
     } catch (e) {
-      console.log(e);
       throw new InternalServerErrorException(e);
     }
   }
