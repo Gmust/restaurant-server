@@ -115,9 +115,8 @@ export class DishesService {
   }
 
   async getAllDishes({ skip = 0, limit, isVegan, category }: GetDishesInterface) {
-    const count = await this.dishModel.countDocuments();
-    const pageTotal = Math.floor((count - 1) / limit) + 1;
-    const currentPage = Math.floor((skip * 6) / limit) + 1;
+    let count;
+    const currentPage = Math.floor((skip * limit) / limit) + 1;
     let data;
 
     if (isVegan && category) {
@@ -125,22 +124,27 @@ export class DishesService {
         .find({ isVegan, category })
         .limit(limit)
         .skip(skip * limit);
+      count = await this.dishModel.find({ isVegan, category }).countDocuments();
     } else if (isVegan) {
       data = await this.dishModel
         .find({ isVegan })
         .limit(limit)
         .skip(skip * limit);
+      count = await this.dishModel.find({ isVegan }).countDocuments();
     } else if (category) {
       data = await this.dishModel
         .find({ category })
         .limit(limit)
         .skip(skip * limit);
+      count = await this.dishModel.find({ category }).countDocuments();
     } else if (!isVegan && !category) {
       data = await this.dishModel
         .find()
         .limit(limit)
         .skip(skip * limit);
+      count = await this.dishModel.find().countDocuments();
     }
+    const pageTotal = Math.floor((count - 1) / limit) + 1;
 
     return {
       data,
