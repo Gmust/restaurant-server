@@ -28,4 +28,12 @@ export class GenerateOrderDocumentDto {
   @IsNotEmpty()
   @IsNumber()
   totalPrice;
+
+  @ApiProperty({
+    example: 'ORD1234',
+    description: 'Order number',
+    type: String,
+  })
+  @IsNotEmpty()
+  orderNumber;
 }

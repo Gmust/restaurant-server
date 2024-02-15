@@ -1,31 +1,29 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ArrayNotEmpty, IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-import * as mongoose from 'mongoose';
-import { Document } from 'mongoose';
+import { ArrayNotEmpty, IsEmail, IsEnum, IsNumber, IsOptional } from 'class-validator';
+import mongoose, { Document } from 'mongoose';
 
 import { Statuses } from '../types/order';
 
-export type OrderDocument = Order & Document;
+export type GuestOrderDocument = Document & GuestOrder;
 
 @Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
-export class Order {
+export class GuestOrder {
+  @Prop({
+    type: String,
+    required: [true, 'Email is required for order!'],
+  })
+  @IsEmail({}, { message: 'Invalid email format' })
+  email: string;
+
   @Prop({ type: String, enum: Object.values(Statuses), default: Statuses.pending })
   @IsEnum(Statuses)
   status: string;
-
-  @Prop({
-    type: mongoose.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'User, who ordered is required'],
-  })
-  user: string;
 
   @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'OrderItem' }] })
   @ArrayNotEmpty({ message: 'At least one order item is required ' })
   orderItems: mongoose.Types.ObjectId[];
 
   @Prop({ type: Number, required: [true, 'Total price is required'] })
-  @IsNotEmpty({ message: 'Total price is required' })
   @IsNumber({}, { message: 'Total price must be a number' })
   totalPrice: number;
 
@@ -40,4 +38,4 @@ export class Order {
   orderNumber: string;
 }
 
-export const OrderSchema = SchemaFactory.createForClass(Order);
+export const GuestOrderSchema = SchemaFactory.createForClass(GuestOrder);

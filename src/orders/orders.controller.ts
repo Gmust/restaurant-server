@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
@@ -16,7 +17,10 @@ import { RoleGuard } from '../auth/guards/role.guard';
 import { Role } from '../auth/roles/roles.decorator';
 import { Roles } from '../types/user';
 import { CompleteOrderDto } from './dto/complete-order.dto';
+import { ConfirmOrderReceivedDto } from './dto/confirm-order-received.dto';
+import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { GetOrderInfoDto } from './dto/get-order-info.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrdersGateway } from './orders.gateway';
 import { OrdersService } from './orders.service';
@@ -35,6 +39,38 @@ export class OrdersController {
   async createNewOrder(@Body() createOrderDto: CreateOrderDto) {
     try {
       return this.orderService.createOrder(createOrderDto);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('create-new-guest-order')
+  async createNewGuestOrder(@Body() createNewGuestOrder: CreateGuestOrderDto) {
+    try {
+      return this.orderService.createOrderForGuest(createNewGuestOrder);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('get-guest-order-info')
+  async getGuestOrderInfo(@Body() { orderNumber, email }: GetOrderInfoDto) {
+    try {
+      return this.orderService.getOrderInfo({ orderNumber, email });
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Role(Roles.administrator, Roles.cook)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Post('confirm-order-received')
+  async confirmOrderReceived(@Body() confirmOrderReceived: ConfirmOrderReceivedDto) {
+    try {
+      return this.orderService.confirmOrderReceived(confirmOrderReceived);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
