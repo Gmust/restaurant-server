@@ -21,6 +21,7 @@ import { TablesModule } from './tables/tables.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     BookingModule,
     EventsModule,
     ReviewsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService, OrdersGateway],
