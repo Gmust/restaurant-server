@@ -17,9 +17,10 @@ import { RoleGuard } from '../auth/guards/role.guard';
 import { Role } from '../auth/roles/roles.decorator';
 import { Roles } from '../types/user';
 import { CompleteOrderDto } from './dto/complete-order.dto';
-import { ConfirmOrderReceivedDto } from './dto/confirm-order-received.dto';
+import { ConfirmOrderDto } from './dto/confirm-order.dto';
 import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { DeleteOrderDto } from './dto/delete-order.dto';
 import { GetOrderInfoDto } from './dto/get-order-info.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrdersGateway } from './orders.gateway';
@@ -65,12 +66,22 @@ export class OrdersController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Post('confirm-order')
+  async confirmOrder(@Body() confirmOrderDto: ConfirmOrderDto) {
+    try {
+      return this.orderService.confirmOrder(confirmOrderDto);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Role(Roles.administrator, Roles.cook)
   @UseGuards(AuthGuard, RoleGuard)
-  @Post('confirm-order-received')
-  async confirmOrderReceived(@Body() confirmOrderReceived: ConfirmOrderReceivedDto) {
+  @Post('delete-order')
+  async deleteOrder(@Body() confirmOrderReceived: DeleteOrderDto) {
     try {
-      return this.orderService.confirmOrderReceived(confirmOrderReceived);
+      return this.orderService.deleteOrder(confirmOrderReceived);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

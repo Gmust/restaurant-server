@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
 
 import { AppModule } from './app.module';
+import rawBodyMiddleware from './middleware/rawBodyMiddleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -16,6 +17,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
+  app.use(rawBodyMiddleware());
   app.useStaticAssets(join(__dirname, '../dishes', 'images'));
   app.enableCors({ origin: 'http://localhost:3000', credentials: true });
   await app.listen(8080);

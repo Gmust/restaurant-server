@@ -1,8 +1,12 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
-import { Cart } from '../../schemas/cart.schema';
+import { CartItem } from '../../schemas/cartItem.schema';
 
 export class CreatePaymentDto {
   @IsNotEmpty()
-  cart: Cart;
+  cartItems: CartItem[];
+
+  @IsNotEmpty()
+  @IsNumber()
+  totalPrice: number;
 }

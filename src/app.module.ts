@@ -22,6 +22,7 @@ import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { PaymentsModule } from './payments/payments.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { PaymentsModule } from './payments/payments.module';
     EventsModule,
     ReviewsModule,
     PaymentsModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [AppService, OrdersGateway],

@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class ConfirmOrderReceivedDto {
+export class DeleteOrderDto {
   @IsNotEmpty()
   orderId: string;
 }

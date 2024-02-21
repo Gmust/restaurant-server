@@ -36,6 +36,12 @@ export class GuestOrder {
 
   @Prop({ type: String, required: [true, 'Order number is required'] })
   orderNumber: string;
+
+  @Prop({ type: String, required: [true, 'confirmation token is required'] })
+  confirmationToken: string;
+
+  @Prop({ type: Boolean, default: false })
+  isConfirmed: boolean;
 }
 
 export const GuestOrderSchema = SchemaFactory.createForClass(GuestOrder);

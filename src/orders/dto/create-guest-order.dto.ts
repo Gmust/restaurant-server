@@ -67,4 +67,12 @@ export class CreateGuestOrderDto {
   @IsNotEmpty()
   @IsNumber()
   totalPrice: number;
+
+  @ApiProperty({
+    example: 'dasdasdas32fweefw',
+    description: 'Confirmation number for order',
+    type: String,
+  })
+  @IsNotEmpty()
+  confirmationToken: string;
 }

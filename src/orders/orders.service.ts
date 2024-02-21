@@ -13,10 +13,12 @@ import { GuestOrder, GuestOrderDocument } from '../schemas/guestOrder.schema';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { OrderItem } from '../schemas/orderItem.schema';
 import { UsersService } from '../users/users.service';
+import { bufferPdf } from '../utils/bufferPdf';
 import { CompleteOrderDto } from './dto/complete-order.dto';
-import { ConfirmOrderReceivedDto } from './dto/confirm-order-received.dto';
+import { ConfirmOrderDto } from './dto/confirm-order.dto';
 import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { DeleteOrderDto } from './dto/delete-order.dto';
 import { GenerateOrderDocumentDto } from './dto/generate-order-document.dto';
 import { GetOrderInfoDto } from './dto/get-order-info.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -128,12 +130,8 @@ export class OrdersService {
     email,
     cartItems,
     totalPrice,
-  }: CreateGuestOrderDto): Promise<
-    | { guestOrder: GuestOrderDocument }
-    | {
-        message: string;
-      }
-  > {
+    confirmationToken,
+  }: CreateGuestOrderDto): Promise<GuestOrderDocument> {
     if (new Date(orderDate).getTime() + 100 * 60 < new Date().getTime()) {
       throw new BadRequestException('Order can`t be created in the past');
     }
@@ -151,24 +149,6 @@ export class OrdersService {
 
     const orderNumber = this.generateOrderNumber();
 
-    const orderDoc = await this.generateOrderDocument({
-      email,
-      totalPrice: totalPrice,
-      orderItems,
-      orderNumber,
-    });
-
-    if (!orderDoc) {
-      throw new InternalServerErrorException('Something went wrong!');
-    }
-
-    await this.mailerService.sendMailWithAttachment({
-      email,
-      document: orderDoc,
-      subject: 'Order',
-      template: 'test-template',
-    });
-
     const guestOrder = await this.guestOrderModel.create({
       totalPrice,
       orderItems: orderItems,
@@ -176,16 +156,14 @@ export class OrdersService {
       email,
       promoCode,
       orderNumber,
+      confirmationToken,
     });
 
     if (!guestOrder) {
       throw new InternalServerErrorException('Something went wrong!');
     }
 
-    return {
-      guestOrder,
-      message: 'A new order has been created and the document has been sent to your email!',
-    };
+    return guestOrder;
   }
 
   private async generateOrderDocument({
@@ -255,24 +233,7 @@ export class OrdersService {
     } as TDocumentDefinitions;
 
     const pdfDocument = printer.createPdfKitDocument(docDefinition);
-    return new Promise<Buffer>((resolve, reject) => {
-      const chunks: Uint8Array[] = [];
-
-      pdfDocument.on('data', (chunk: Uint8Array) => {
-        chunks.push(chunk);
-      });
-
-      pdfDocument.on('end', () => {
-        const buffer = Buffer.concat(chunks);
-        resolve(buffer);
-      });
-
-      pdfDocument.on('error', (error: Error) => {
-        reject(error);
-      });
-
-      pdfDocument.end();
-    });
+    return bufferPdf(pdfDocument);
   }
 
   public async getOrderInfo({ orderNumber, email }: GetOrderInfoDto): Promise<GuestOrderDocument> {
@@ -287,11 +248,11 @@ export class OrdersService {
     return guestOrder;
   }
 
-  public async confirmOrderReceived({ orderId }: ConfirmOrderReceivedDto) {
+  public async deleteOrder({ orderId }: DeleteOrderDto) {
     await this.orderModel.findByIdAndDelete(orderId);
     await this.guestOrderModel.findByIdAndDelete(orderId);
     return {
-      message: 'Order received successfully confirmed',
+      message: 'Success',
     };
   }
 
@@ -321,6 +282,40 @@ export class OrdersService {
 
     return {
       message: 'Order Successfully completed!',
+    };
+  }
+
+  public async confirmOrder({ email, orderNumber, confirmationToken }: ConfirmOrderDto) {
+    const order = await this.getOrderInfo({ orderNumber, email });
+
+    if (order.confirmationToken !== confirmationToken) {
+      throw new BadRequestException('Invalid confirmation token');
+    }
+
+    order.isConfirmed = true;
+    order.save({ validateBeforeSave: false });
+
+    const orderDoc = await this.generateOrderDocument({
+      email,
+      totalPrice: order.totalPrice,
+      orderItems: order.orderItems as unknown as OrderItem[],
+      orderNumber,
+    });
+
+    if (!orderDoc) {
+      throw new InternalServerErrorException('Something went wrong!');
+    }
+
+    await this.mailerService.sendMailWithAttachment({
+      email,
+      document: orderDoc,
+      subject: 'Order',
+      template: 'test-template',
+    });
+
+    return {
+      message:
+        'Order info was sent to your email, use your email and order number to get status of your order',
     };
   }
 }
