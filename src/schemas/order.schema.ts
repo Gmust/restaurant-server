@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ArrayNotEmpty, IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
 
@@ -20,8 +20,7 @@ export class Order {
   })
   user: string;
 
-  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'OrderItem' }] })
-  @ArrayNotEmpty({ message: 'At least one order item is required ' })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem' }] })
   orderItems: mongoose.Types.ObjectId[];
 
   @Prop({ type: Number, required: [true, 'Total price is required'] })

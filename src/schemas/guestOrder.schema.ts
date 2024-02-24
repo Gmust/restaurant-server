@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ArrayNotEmpty, IsEmail, IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsEmail, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 
 import { Statuses } from '../types/order';
@@ -19,8 +19,7 @@ export class GuestOrder {
   @IsEnum(Statuses)
   status: string;
 
-  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'OrderItem' }] })
-  @ArrayNotEmpty({ message: 'At least one order item is required ' })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem' }] })
   orderItems: mongoose.Types.ObjectId[];
 
   @Prop({ type: Number, required: [true, 'Total price is required'] })

@@ -164,7 +164,21 @@ export class OrdersService {
       throw new InternalServerErrorException('Something went wrong!');
     }
 
-    return guestOrder;
+    console.log(
+      guestOrder.populate({
+        path: 'orderItems',
+        populate: {
+          path: 'dish',
+        },
+      })
+    );
+
+    return guestOrder.populate({
+      path: 'orderItems',
+      populate: {
+        path: 'dish',
+      },
+    });
   }
 
   private async generateOrderDocument({
@@ -237,16 +251,39 @@ export class OrdersService {
     return bufferPdf(pdfDocument);
   }
 
-  public async getOrderInfo({ orderNumber, email }: GetOrderInfoDto): Promise<GuestOrderDocument> {
-    const guestOrder = await this.guestOrderModel
-      .findOne({ email, orderNumber })
-      .populate('orderItems');
+  public async getOrderInfo({
+    orderNumber,
+    email,
+  }: GetOrderInfoDto): Promise<GuestOrderDocument | OrderDocument> {
+    const user = await this.usersService.findOne(email);
 
-    if (!guestOrder) {
-      throw new BadRequestException('Invalid email or order info');
+    if (user) {
+      const userOrder = await this.orderModel.findOne({ user: user._id, orderNumber }).populate({
+        path: 'orderItems',
+        populate: {
+          path: 'dish',
+        },
+      });
+
+      if (!userOrder) {
+        throw new BadRequestException('Invalid email or order info');
+      }
+
+      return userOrder;
+    } else {
+      const guestOrder = await this.guestOrderModel.findOne({ email, orderNumber }).populate({
+        path: 'orderItems',
+        populate: {
+          path: 'dish',
+        },
+      });
+
+      if (!guestOrder) {
+        throw new BadRequestException('Invalid email or order info');
+      }
+
+      return guestOrder;
     }
-
-    return guestOrder;
   }
 
   public async deleteOrder({ orderId }: DeleteOrderDto) {

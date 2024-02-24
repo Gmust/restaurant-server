@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
@@ -57,7 +56,7 @@ export class OrdersController {
 
   @HttpCode(HttpStatus.OK)
   @Post('get-order-info')
-  async getGuestOrderInfo(@Body() { orderNumber, email }: GetOrderInfoDto) {
+  async getOrderInfo(@Body() { orderNumber, email }: GetOrderInfoDto) {
     console.log(orderNumber, email);
     try {
       return this.orderService.getOrderInfo({ orderNumber, email });
