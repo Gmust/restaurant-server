@@ -55,8 +55,8 @@ export class PaymentsService {
       const session = await this.stripe.checkout.sessions.create({
         line_items: lineItems,
         mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL}/successful-payment?confirmationToken=${newOrder.confirmationToken}&orderNum=${newOrder.orderNumber}&email=${newOrder.email}`,
-        cancel_url: `${process.env.FRONTEND_URL}/abandoned-payment?orderId=${newOrder._id}`,
+        success_url: `${process.env.FRONTEND_URL}/order/successful-payment?confirmationToken=${newOrder.confirmationToken}&orderNum=${newOrder.orderNumber}&email=${newOrder.email}`,
+        cancel_url: `${process.env.FRONTEND_URL}/order/abandoned-payment?orderId=${newOrder._id}`,
       });
       return {
         sessionId: session.id,

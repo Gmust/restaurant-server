@@ -56,8 +56,9 @@ export class OrdersController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get('get-guest-order-info')
+  @Post('get-order-info')
   async getGuestOrderInfo(@Body() { orderNumber, email }: GetOrderInfoDto) {
+    console.log(orderNumber, email);
     try {
       return this.orderService.getOrderInfo({ orderNumber, email });
     } catch (e) {

@@ -43,7 +43,7 @@ export class OrdersService {
         dish: cartItem.dish,
         quantity: cartItem.quantity,
       });
-      orderItems.push(cartItem);
+      orderItems.push(newOrderItem);
     }
     return orderItems;
   }
@@ -57,6 +57,7 @@ export class OrdersService {
     promoCode,
     takeaway,
     email,
+    confirmationToken,
   }: CreateOrderDto): Promise<{ newOrder: OrderDocument } | { message: string }> {
     if (new Date(orderDate).getTime() + 100 * 60 < new Date().getTime()) {
       throw new BadRequestException('Order can`t be created in the past');
@@ -67,7 +68,6 @@ export class OrdersService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const orderItems: OrderItem[] = await this.fillOrderItems(userCart.cartItems);
-
     if (orderItems.length < 1) {
       throw new BadRequestException('Please add dishes to your cart');
     }
@@ -108,6 +108,7 @@ export class OrdersService {
       user: userBD,
       promoCode,
       orderNumber,
+      confirmationToken,
     });
 
     if (!newOrder) {
@@ -151,7 +152,7 @@ export class OrdersService {
 
     const guestOrder = await this.guestOrderModel.create({
       totalPrice,
-      orderItems: orderItems,
+      orderItems,
       takeaway,
       email,
       promoCode,
