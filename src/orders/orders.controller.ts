@@ -9,6 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -78,7 +79,7 @@ export class OrdersController {
   @HttpCode(HttpStatus.OK)
   @Role(Roles.administrator, Roles.cook)
   @UseGuards(AuthGuard, RoleGuard)
-  @Post('delete-order')
+  @Delete('delete-order')
   async deleteOrder(@Body() confirmOrderReceived: DeleteOrderDto) {
     try {
       return this.orderService.deleteOrder(confirmOrderReceived);
@@ -111,6 +112,15 @@ export class OrdersController {
   async completeOrder(@Body() completeOrderDro: CompleteOrderDto) {
     try {
       return this.orderService.completeOrder(completeOrderDro);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  deleteAllUcinfirmedChanges() {
+    try {
+      return this.orderService.deleteAllUnconfirmedOrders();
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

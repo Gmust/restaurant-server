@@ -356,4 +356,8 @@ export class OrdersService {
         'Order info was sent to your email, use your email and order number to get status of your order',
     };
   }
+
+  public async deleteAllUnconfirmedOrders() {
+    await this.orderItemModel.deleteMany({ isConfirmed: false });
+  }
 }
