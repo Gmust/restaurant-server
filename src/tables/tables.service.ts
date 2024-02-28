@@ -53,7 +53,7 @@ export class TablesService {
   }
 
   async getTableByNum(tableNum: number): Promise<TableDocument | null> {
-    const table = await this.tableModel.findOne({ tableNum });
+    const table = await this.tableModel.findOne({ tableNum: tableNum });
     if (!table) {
       throw new NotFoundException('Invalid table number');
     } else {

@@ -39,8 +39,6 @@ export class TablesController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Role(Roles.administrator)
-  @UseGuards(RoleGuard, AuthGuard)
   @Get(':id')
   async getTable(@Param() param: { id: string }) {
     try {
@@ -51,8 +49,6 @@ export class TablesController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Role(Roles.administrator)
-  @UseGuards(RoleGuard, AuthGuard)
   @Get('')
   async getAllTables() {
     try {
@@ -81,6 +77,16 @@ export class TablesController {
   async deleteTable(@Param() param: { id: string }) {
     try {
       return this.tablesService.deleteTable(param.id);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('get-by-number/:tableNum')
+  async getTableByNum(@Param('tableNum') tableNum: string) {
+    try {
+      return this.tablesService.getTableByNum(Number(tableNum));
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

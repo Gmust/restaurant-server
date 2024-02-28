@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -80,10 +81,29 @@ export class BookingController {
     }
   }
 
-  @Cron(CronExpression.EVERY_6_HOURS)
-  deleteAllUnconfirmedReservations() {
+  @HttpCode(HttpStatus.OK)
+  @Get('get-all-reservations/:id')
+  getFullTableReservations(@Param() params: { id: string }) {
+    try {
+      return this.bookingService.getFullTableReservations(params.id);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_30_MINUTES)
+  async deleteAllUnconfirmedReservations() {
     try {
       return this.bookingService.deleteAllUnconfirmedReservations();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_11PM)
+  async deleteAllReservations() {
+    try {
+      return this.bookingService.deleteAllReservationsForDay();
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

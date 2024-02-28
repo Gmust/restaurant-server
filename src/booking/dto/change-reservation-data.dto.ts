@@ -1,9 +1,11 @@
-import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+
+import { ReservationTime } from '../../types/booking';
 
 export class ChangeReservationDataDto {
   @IsOptional()
-  @IsDateString()
-  timeOfReservation: Date;
+  @IsEnum(ReservationTime)
+  timeOfReservation: ReservationTime;
 
   @IsNotEmpty()
   @IsNumber()

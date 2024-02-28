@@ -35,6 +35,17 @@ export class BookingService {
 
     const tableDb = await this.tablesService.getTableByNum(table);
 
+    const existingReservation = await this.bookingModel.find({
+      table: tableDb,
+      timeOfReservation: timeOfReservation,
+    });
+
+    console.log(existingReservation);
+
+    if (existingReservation.length > 0) {
+      throw new BadRequestException('Table already booked for this time slot');
+    }
+
     if (tableDb.numberOfSeats < amountOfVisitors) {
       throw new BadRequestException(
         'Amount of visitors can`t be bigger than amount of available number of seats'
@@ -200,7 +211,20 @@ export class BookingService {
     return this.bookingModel.find({ isConfirmed: confirmed });
   }
 
+  public async deleteAllReservationsForDay() {
+    return this.bookingModel.deleteMany();
+  }
+
   public async deleteAllUnconfirmedReservations() {
     return this.bookingModel.deleteMany({ isConfirmed: false });
+  }
+
+  public async getFullTableReservations(tableId: string): Promise<Booking[] | []> {
+    const reservations = await this.bookingModel.find({ table: tableId });
+    if (!reservations) {
+      return [];
+    } else {
+      return reservations;
+    }
   }
 }
