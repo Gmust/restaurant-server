@@ -5,14 +5,11 @@ export type TableDocument = Table & Document;
 
 @Schema()
 export class Table {
-  @Prop({ type: Number, required: [true, 'Table number is required'], unique: true })
+  @Prop({ type: Number, required: [true, 'Table number is required'], unique: false })
   tableNum: number;
 
   @Prop({ type: Number, required: [true, 'Number of seats is required'] })
   numberOfSeats: number;
-
-  @Prop({ type: Boolean, default: false })
-  isAvailable: boolean;
 }
 
 export const TableSchema = SchemaFactory.createForClass(Table);

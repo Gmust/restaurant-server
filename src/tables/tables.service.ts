@@ -18,15 +18,15 @@ export class TablesService {
     return this.tableModel.find();
   }
 
-  async createTable({ tableNum, numberOfSeats, isAvailable }: CreateTableDto) {
-    const newTable = await this.tableModel.create({ tableNum, numberOfSeats, isAvailable });
+  async createTable({ tableNum, numberOfSeats }: CreateTableDto) {
+    const newTable = await this.tableModel.create({ tableNum, numberOfSeats });
     return {
       newTable,
       message: 'New table created successfully',
     };
   }
 
-  async updateTableInfo({ tableNum, numberOfSeats, isAvailable, tableId }: UpdateTableDto) {
+  async updateTableInfo({ tableNum, numberOfSeats, tableId }: UpdateTableDto) {
     const table = await this.tableModel.findById(tableId);
 
     if (tableNum !== undefined) {
@@ -34,9 +34,6 @@ export class TablesService {
     }
     if (numberOfSeats !== undefined) {
       table.numberOfSeats = numberOfSeats;
-    }
-    if (isAvailable !== undefined) {
-      table.isAvailable = isAvailable;
     }
     table.save();
     return {

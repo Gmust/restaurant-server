@@ -23,4 +23,7 @@ export class ChangeReservationDataDto {
   @IsNumber()
   @IsEmail()
   email: string;
+
+  @IsNotEmpty()
+  reservationId: string;
 }

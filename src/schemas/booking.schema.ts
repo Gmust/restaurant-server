@@ -13,6 +13,7 @@ export class Booking {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Table',
     required: [true, 'Table is required!'],
+    unique: false,
   })
   table: mongoose.Schema.Types.ObjectId;
 

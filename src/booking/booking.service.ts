@@ -29,27 +29,26 @@ export class BookingService {
     amountOfVisitors,
     email,
   }: CreateReservationDto) {
-    if (new Date(timeOfReservation).getTime() < new Date().getTime()) {
-      throw new BadRequestException('Table cannot be reserved for a past date');
+    if (new Date(timeOfReservation).getTime() <= new Date().getTime()) {
+      throw new BadRequestException('Reservation time must be in the future');
     }
 
     const tableDb = await this.tablesService.getTableByNum(table);
+    if (!tableDb) {
+      throw new NotFoundException('Table not found');
+    }
 
-    const existingReservation = await this.bookingModel.find({
-      table: tableDb,
-      timeOfReservation: timeOfReservation,
+    const existingReservations = await this.bookingModel.find({
+      table: tableDb._id,
+      timeOfReservation,
     });
 
-    console.log(existingReservation);
-
-    if (existingReservation.length > 0) {
+    if (existingReservations.length > 0) {
       throw new BadRequestException('Table already booked for this time slot');
     }
 
     if (tableDb.numberOfSeats < amountOfVisitors) {
-      throw new BadRequestException(
-        'Amount of visitors can`t be bigger than amount of available number of seats'
-      );
+      throw new BadRequestException('Not enough seats available for this reservation');
     }
 
     const newBooking = await this.bookingModel.create({
@@ -59,20 +58,16 @@ export class BookingService {
       email,
     });
 
-    const link = `${process.env.FRONTEND_URL}/confirm-reservation?t=${tableDb.tableNum}&email=${email}`;
-
+    const confirmationLink = `${process.env.FRONTEND_URL}/booking/confirm-reservation?t=${tableDb.tableNum}&email=${email}&reservationId=${newBooking._id}`;
     await this.mailingService.sendConfirmationMail({
-      link: link,
-      email: email,
-      subject: 'Reservation confirmation',
+      link: confirmationLink,
+      email,
+      subject: 'Reservation Confirmation',
       template: 'reservation-confirmation-template',
     });
 
-    tableDb.isAvailable = false;
-    await tableDb.save();
-
     return {
-      message: 'The booking document has been sent to your email!',
+      message: 'The booking document has been sent to your email',
       newBooking,
     };
   }
@@ -115,12 +110,9 @@ export class BookingService {
   }
 
   private async findReservation({
-    table,
-    email,
+    reservationId,
   }: FindReservationDto): Promise<BookingDocument | null> {
-    const tableDb = await this.tablesService.getTableByNum(table);
-    const reservation = await this.bookingModel.findOne({ table: tableDb, email });
-
+    const reservation = await this.bookingModel.findById(reservationId);
     if (!reservation) {
       throw new NotFoundException(
         'No reservation found for the table number and email address provided! Perhaps the time for this confirmation has expired!'
@@ -130,14 +122,23 @@ export class BookingService {
     }
   }
 
-  public async confirmReservation({ confirmed, email, table }: ConfirmReservationDto) {
-    const reservation = await this.findReservation({ table, email });
+  public async confirmReservation({
+    confirmed,
+    email,
+    table,
+    reservationId,
+  }: ConfirmReservationDto) {
+    const reservation = await this.findReservation({ reservationId });
+
+    if (reservation.isConfirmed === true) {
+      return {
+        message: 'You have already confirmed your reservation!',
+      };
+    }
 
     const tableDb = await this.tablesService.getTableByNum(table);
     if (confirmed === false) {
-      await this.cancelReservation({ table, email });
-      tableDb.isAvailable = true;
-      await tableDb.save();
+      await this.cancelReservation({ reservationId });
       return {
         message: 'Confirmation denied',
       };
@@ -170,8 +171,9 @@ export class BookingService {
     amountOfVisitors,
     email,
     newTable,
+    reservationId,
   }: ChangeReservationDataDto) {
-    const reservation = await this.findReservation({ email, table });
+    const reservation = await this.findReservation({ reservationId });
 
     if (timeOfReservation) {
       reservation.timeOfReservation = timeOfReservation;
@@ -197,8 +199,8 @@ export class BookingService {
     };
   }
 
-  public async cancelReservation({ table, email }: CancelReservationDto) {
-    const reservation = await this.findReservation({ table, email });
+  public async cancelReservation({ reservationId }: CancelReservationDto) {
+    const reservation = await this.findReservation({ reservationId });
 
     await this.bookingModel.deleteOne({ table: reservation.table });
 

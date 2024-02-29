@@ -12,4 +12,7 @@ export class ConfirmReservationDto {
   @IsNotEmpty()
   @IsBoolean()
   confirmed: boolean;
+
+  @IsNotEmpty()
+  reservationId: string;
 }

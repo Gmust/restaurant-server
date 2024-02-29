@@ -25,12 +25,4 @@ export class UpdateTableDto {
   })
   @IsOptional()
   numberOfSeats: number;
-
-  @ApiProperty({
-    example: false,
-    description: 'Is table available',
-    type: Boolean,
-  })
-  @IsOptional()
-  isAvailable: boolean;
 }

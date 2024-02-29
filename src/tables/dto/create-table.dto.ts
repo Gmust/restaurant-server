@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateTableDto {
   @ApiProperty({
@@ -19,13 +19,4 @@ export class CreateTableDto {
   @IsNotEmpty()
   @IsNumber()
   numberOfSeats: number;
-
-  @ApiProperty({
-    example: true,
-    description: 'Is table available aat the moment',
-    type: Boolean,
-  })
-  @IsNotEmpty()
-  @IsBoolean()
-  isAvailable: boolean;
 }
