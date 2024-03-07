@@ -15,6 +15,7 @@ import { MailingService } from '../mailing/mailing.service';
 import { User } from '../schemas/user.schema';
 import { UsersService } from '../users/users.service';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -63,7 +64,10 @@ export class AuthService {
   }
 
   async generateAccessToken(user: User): Promise<string> {
-    return this.jwtService.signAsync({ user });
+    return this.jwtService.signAsync(
+      { user },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET }
+    );
   }
 
   async generateRefreshToken(userId: string): Promise<string> {
@@ -91,7 +95,7 @@ export class AuthService {
     createdUser.cart = newCart._id;
 
     const confirmationToken = await createdUser.createConfirmationToken();
-    const confirmationLink = `${process.env.FRONTEND_URL}/confirm-account?token=${confirmationToken}`;
+    const confirmationLink = `${process.env.FRONTEND_URL}/confirm-account?token=${confirmationToken}&email=${createdUser.email}`;
 
     createdUser.confirmationToken = confirmationToken;
     await createdUser.save();
@@ -109,16 +113,30 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
+    if (!token) {
+      throw new UnauthorizedException('Provide token!');
+    }
     return this.jwtService.verify(token);
   }
 
   async getUserByToken(token: string) {
-    try {
-      const decodedToken = this.jwtService.verify(token);
-      return decodedToken.user;
-    } catch (error) {
-      throw new UnauthorizedException('Token verification failed:');
-      return null;
+    const parsedTokenData = await this.parseJwt(token);
+    return this.userService.findOne(parsedTokenData.user.email);
+  }
+
+  async refreshToken({ refresh_token, email }: RefreshTokenDto) {
+    const validToken = await this.validateToken(refresh_token);
+    const user = await this.userService.findOne(email);
+    const access = await this.generateAccessToken(user);
+    if (validToken.error) {
+      if (validToken.error === 'jwt expired') {
+        const refresh = this.generateRefreshToken(user._id as unknown as string);
+        return { access_token: access, ...refresh };
+      } else {
+        return { error: validToken.error };
+      }
+    } else {
+      return { access_token: access, refresh_token: refresh_token };
     }
   }
 
