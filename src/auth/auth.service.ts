@@ -113,15 +113,20 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
-    if (!token) {
-      throw new UnauthorizedException('Provide token!');
+    try {
+      if (!token) {
+        throw new UnauthorizedException('Provide token!');
+      }
+      return this.jwtService.verify(token, {});
+    } catch (e) {
+      console.log(e);
     }
-    return this.jwtService.verify(token);
   }
 
   async getUserByToken(token: string) {
     const parsedTokenData = await this.parseJwt(token);
-    return this.userService.findOne(parsedTokenData.user.email);
+    const user = await this.userService.findOne(parsedTokenData.user.email);
+    return user;
   }
 
   async refreshToken({ refresh_token, email }: RefreshTokenDto) {

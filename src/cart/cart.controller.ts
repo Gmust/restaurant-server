@@ -5,7 +5,9 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -21,11 +23,15 @@ import { RemoveFromCartDto } from './dto/remove-from-cart.dto';
 export class CartController {
   constructor(private cartService: CartService) {}
 
-  @HttpCode(HttpStatus.FOUND)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   @Get()
-  async getCart(@Body() { cartId }: { cartId: string }) {
-    return this.cartService.getCart(cartId);
+  async getCart(@Query('cartId') cartId: string) {
+    try {
+      return this.cartService.getCart(cartId);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
   }
 
   @HttpCode(HttpStatus.OK)
