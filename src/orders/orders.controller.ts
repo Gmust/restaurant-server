@@ -2,11 +2,13 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -58,7 +60,6 @@ export class OrdersController {
   @HttpCode(HttpStatus.OK)
   @Post('get-order-info')
   async getOrderInfo(@Body() { orderNumber, email }: GetOrderInfoDto) {
-    console.log(orderNumber, email);
     try {
       return this.orderService.getOrderInfo({ orderNumber, email });
     } catch (e) {
@@ -117,8 +118,19 @@ export class OrdersController {
     }
   }
 
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @Get('')
+  async getUserOrders(@Query('userId') userId: string) {
+    try {
+      return this.orderService.getUserOrders(userId);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  deleteAllUcinfirmedChanges() {
+  deleteAllUnconfirmedChanges() {
     try {
       return this.orderService.deleteAllUnconfirmedOrders();
     } catch (e) {

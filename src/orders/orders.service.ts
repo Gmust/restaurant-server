@@ -58,13 +58,15 @@ export class OrdersService {
     takeaway,
     email,
     confirmationToken,
-  }: CreateOrderDto): Promise<{ newOrder: OrderDocument } | { message: string }> {
+  }: CreateOrderDto): Promise<OrderDocument> {
     if (new Date(orderDate).getTime() + 100 * 60 < new Date().getTime()) {
       throw new BadRequestException('Order can`t be created in the past');
     }
 
     const userBD = await this.usersService.findOne(email);
-    const userCart = await this.cartService.getCart(String(userBD.cart));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const userCart = await this.cartService.getCart(String(userBD.cart._id));
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const orderItems: OrderItem[] = await this.fillOrderItems(userCart.cartItems);
@@ -96,11 +98,6 @@ export class OrdersService {
       template: 'test-template',
     });
 
-    userCart.totalPrice = 0;
-    userCart.cartItems = [];
-
-    userCart.save({ validateBeforeSave: false });
-
     const newOrder = await this.orderModel.create({
       totalPrice: userCart.totalPrice,
       orderItems,
@@ -115,13 +112,20 @@ export class OrdersService {
       throw new InternalServerErrorException('Something went wrong!');
     }
 
+    userCart.totalPrice = 0;
+    userCart.cartItems = [];
+
+    userCart.save({ validateBeforeSave: false });
+
     userBD.orders.push(newOrder._id);
     await userBD.save({ validateBeforeSave: false });
 
-    return {
-      newOrder,
-      message: 'A new order has been created and the document has been sent to your email!',
-    };
+    return newOrder.populate({
+      path: 'orderItems',
+      populate: {
+        path: 'dish',
+      },
+    });
   }
 
   public async createOrderForGuest({
@@ -163,15 +167,6 @@ export class OrdersService {
     if (!guestOrder) {
       throw new InternalServerErrorException('Something went wrong!');
     }
-
-    console.log(
-      guestOrder.populate({
-        path: 'orderItems',
-        populate: {
-          path: 'dish',
-        },
-      })
-    );
 
     return guestOrder.populate({
       path: 'orderItems',
@@ -258,18 +253,28 @@ export class OrdersService {
     const user = await this.usersService.findOne(email);
 
     if (user) {
-      const userOrder = await this.orderModel.findOne({ user: user._id, orderNumber }).populate({
+      const guestOrder = await this.guestOrderModel.findOne({ email, orderNumber }).populate({
         path: 'orderItems',
         populate: {
           path: 'dish',
         },
       });
 
-      if (!userOrder) {
-        throw new BadRequestException('Invalid email or order info');
-      }
+      if (!guestOrder) {
+        const userOrder = await this.orderModel.findOne({ user: user._id, orderNumber }).populate({
+          path: 'orderItems',
+          populate: {
+            path: 'dish',
+          },
+        });
 
-      return userOrder;
+        if (!userOrder) {
+          throw new BadRequestException('Invalid email or order info');
+        }
+
+        return userOrder;
+      }
+      return guestOrder;
     } else {
       const guestOrder = await this.guestOrderModel.findOne({ email, orderNumber }).populate({
         path: 'orderItems',
@@ -331,7 +336,7 @@ export class OrdersService {
     }
 
     order.isConfirmed = true;
-    order.save({ validateBeforeSave: false });
+    await order.save({ validateBeforeSave: false });
 
     const orderDoc = await this.generateOrderDocument({
       email,
@@ -359,5 +364,16 @@ export class OrdersService {
 
   public async deleteAllUnconfirmedOrders() {
     await this.orderItemModel.deleteMany({ isConfirmed: false });
+  }
+
+  public async getUserOrders(userId: string) {
+    const user = await this.usersService.findById(userId);
+    const orders = await this.orderModel.find({ user: user._id }).populate({
+      path: 'orderItems',
+      populate: {
+        path: 'dish',
+      },
+    });
+    return orders;
   }
 }

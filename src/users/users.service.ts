@@ -23,7 +23,7 @@ export class UsersService {
       throw new HttpException('Provide email!', HttpStatus.BAD_REQUEST);
     }
 
-    return this.userModel.findOne({ email }).populate('cart orders');
+    return this.userModel.findOne({ email }).populate('cart orders').exec();
   }
 
   async findById(id: string): Promise<UserDocument | null> {
