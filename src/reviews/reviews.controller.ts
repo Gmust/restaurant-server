@@ -67,4 +67,14 @@ export class ReviewsController {
       throw new InternalServerErrorException(e);
     }
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id')
+  async getUserReview(@Param('id') id: string) {
+    try {
+      return this.reviewsService.getUserReview(id);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
 }

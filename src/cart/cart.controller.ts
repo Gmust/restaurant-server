@@ -50,7 +50,7 @@ export class CartController {
 
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  @Delete('remove-form-cart')
+  @Delete('remove-from-cart')
   async removeFromCart(@Body() removeFromCartDto: RemoveFromCartDto) {
     return this.cartService.removerFromCart(removeFromCartDto);
   }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
+  Param,
   Patch,
   Post,
   Query,
@@ -68,6 +70,16 @@ export class OrdersController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Get('get-order/:id')
+  async getOrderInfoById(@Param('id') id: string) {
+    try {
+      return this.orderService.getOrderById(id);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Post('confirm-order')
   async confirmOrder(@Body() confirmOrderDto: ConfirmOrderDto) {
     try {
@@ -95,9 +107,16 @@ export class OrdersController {
   @Patch('update-order-status')
   async updateOrderStatus(@Body() updateOrderStatusDto: UpdateOrderStatusDto) {
     try {
-      const { orderId, newStatus, userId } =
-        await this.orderService.updateOrderStatus(updateOrderStatusDto);
-      this.ordersGateway.handleStatus({ orderId, newStatus, userId });
+      const updateOrderStatus = await this.orderService.updateOrderStatus(updateOrderStatusDto);
+      if (!updateOrderStatusDto) {
+        throw new BadRequestException('Something went wrong!');
+      }
+      console.log(updateOrderStatus);
+      this.ordersGateway.handleStatus({
+        orderId: updateOrderStatus.orderId,
+        newStatus: updateOrderStatusDto.newStatus,
+        userId: updateOrderStatusDto.userId,
+      });
       return {
         message: 'Order status successfully updated',
       };

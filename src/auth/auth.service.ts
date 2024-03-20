@@ -113,14 +113,8 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
-    try {
-      if (!token) {
-        throw new UnauthorizedException('Provide token!');
-      }
-      return this.jwtService.verify(token, {});
-    } catch (e) {
-      console.log(e);
-    }
+    if (!token) return null;
+    return this.jwtService.verify(token);
   }
 
   async getUserByToken(token: string) {
@@ -222,6 +216,7 @@ export class AuthService {
   }
 
   async parseJwt(token) {
+    if (!token) return null;
     const t = String(token);
     return JSON.parse(Buffer.from(t.split('.')[1], 'base64').toString());
   }

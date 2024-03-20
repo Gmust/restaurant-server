@@ -94,4 +94,14 @@ export class ReviewsService {
       pageTotal,
     };
   }
+
+  public async getUserReview(reviewId: string) {
+    const review = await this.reviewModel.findById(reviewId).populate('user');
+
+    if (!review) {
+      throw new BadRequestException('Invalid id, or user don`t have review');
+    }
+
+    return review;
+  }
 }

@@ -376,4 +376,21 @@ export class OrdersService {
     });
     return orders;
   }
+
+  public async getOrderById(id: string) {
+    if (!id) {
+      throw new BadRequestException('Provide id');
+    }
+
+    const order = await this.orderModel.findById(id).populate({
+      path: 'orderItems',
+      populate: {
+        path: 'dish',
+      },
+    });
+    if (!order) {
+      throw new BadRequestException('Invalid id!');
+    }
+    return order;
+  }
 }
