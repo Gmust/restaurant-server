@@ -40,9 +40,10 @@ export class DishesService {
         throw new ForbiddenException('Something went wrong with creating dish file!');
       }
 
+      const dish = await this.dishModel.findById(newDish._id).populate('ingredients');
       return {
         message: 'New dish successfully created!',
-        dish: newDish,
+        dish: dish,
       };
     } catch (e) {
       if (e.code === 11000) throw new ConflictException('Dish with the same name already exists.');
@@ -114,7 +115,7 @@ export class DishesService {
     };
   }
 
-  async getAllDishes({ skip = 0, limit, isVegan, category }: GetDishesInterface) {
+  async getDishes({ skip = 0, limit, isVegan, category }: GetDishesInterface) {
     let count;
     const currentPage = Math.floor((skip * limit) / limit) + 1;
     let data;
@@ -153,11 +154,26 @@ export class DishesService {
     };
   }
 
+  async getAllDishes() {
+    return this.dishModel.find().populate('ingredients');
+  }
+
   async createSpecialtiesMenu({ specialties }: CreateSpecialtiesDto) {
     return this.specialtiesModel.create({ specialtyDishes: specialties });
   }
 
   async getSpecialtiesMenu() {
     return this.specialtiesModel.find().populate('specialtyDishes');
+  }
+
+  async getDishesByTerm(term: string) {
+    const termRegex = term ? new RegExp(term, 'i') : undefined;
+    if (!termRegex) {
+      const dishes = await this.dishModel.find().populate('ingredients');
+      return dishes;
+    } else {
+      const dishes = await this.dishModel.find({ name: termRegex }).populate('ingredients');
+      return dishes;
+    }
   }
 }

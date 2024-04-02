@@ -21,7 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import path from 'path';
-import { uuid } from 'uuidv4';
+import { v4 } from 'uuid';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -47,7 +47,7 @@ export class DishesController {
       storage: diskStorage({
         destination: './dishes/images',
         filename: (req, file, callback) => {
-          const filename = path.parse(file.originalname).name.replace(/\s/g, '') + uuid();
+          const filename = path.parse(file.originalname).name.replace(/\s/g, '') + v4();
           const extension = path.parse(file.originalname).ext;
           callback(null, `${filename}${extension}`);
         },
@@ -66,6 +66,7 @@ export class DishesController {
     @UploadedFile() image: Express.Multer.File,
     @Body() createDishDto: CreateDishDto
   ) {
+    console.log(createDishDto);
     if (!image) {
       throw new BadRequestException('No file uploaded');
     }
@@ -97,8 +98,20 @@ export class DishesController {
 
   @HttpCode(HttpStatus.OK)
   @Get('')
-  async getAllDishes(@Query() { limit, skip, isVegan, category }: GetDishesInterface) {
-    return this.dishesService.getAllDishes({ skip, limit, isVegan, category });
+  async getDishes(@Query() { limit, skip, isVegan, category }: GetDishesInterface) {
+    return this.dishesService.getDishes({ skip, limit, isVegan, category });
+  }
+
+  @Role(Roles.administrator, Roles.cook)
+  @UseGuards(AuthGuard, RoleGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get('all')
+  async getAllDishes() {
+    try {
+      return this.dishesService.getAllDishes();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
   }
 
   @HttpCode(HttpStatus.OK)
@@ -122,4 +135,15 @@ export class DishesController {
       throw new InternalServerErrorException(e);
     }
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/find')
+  async getDishesByTerm(@Query('term') term: string) {
+    try {
+      return this.dishesService.getDishesByTerm(term);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
 }

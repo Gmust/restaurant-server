@@ -19,6 +19,14 @@ export class IngredientsService {
   }
 
   async createIngredient({ name, unit, quantity }: CreateIngredientDto) {
+    const existingIngredient = await this.ingredientModel.findOne({
+      name: name,
+      quantity: quantity,
+    });
+    if (existingIngredient) {
+      throw new BadRequestException('Ingredient with this name and quantity already exists');
+    }
+
     const ingredient = await this.ingredientModel.create({ name, unit, quantity });
     return {
       message: 'Ingredient successfully created!',
@@ -26,11 +34,21 @@ export class IngredientsService {
     };
   }
 
-  async updateIngredient({ id, quantity, name, unit }: UpdateIngredientDto): Promise<Ingredient> {
-    if (!id) {
+  async updateIngredient({ _id, quantity, name, unit }: UpdateIngredientDto): Promise<Ingredient> {
+    if (!_id) {
       throw new BadRequestException('Provide Id');
     }
-    return this.ingredientModel.findByIdAndUpdate(id, { name, unit, quantity });
+    const updatedDocument = await this.ingredientModel.findByIdAndUpdate(
+      _id,
+      {
+        name,
+        unit,
+        quantity,
+      },
+      { new: true }
+    );
+
+    return updatedDocument;
   }
 
   async deleteIngredient(id: string) {
@@ -42,5 +60,9 @@ export class IngredientsService {
     return {
       message: 'Ingredient successfully deleted!',
     };
+  }
+
+  async getAllIngredients() {
+    return this.ingredientModel.find();
   }
 }

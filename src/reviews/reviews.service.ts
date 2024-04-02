@@ -46,6 +46,10 @@ export class ReviewsService {
   public async updateReview({ newRating, newComment, reviewId }: UpdateReviewDto) {
     const review = await this.reviewModel.findById(reviewId);
 
+    if (!review) {
+      throw new BadRequestException('Invalid reveiw id');
+    }
+
     if (newRating) {
       review.rating = newRating;
     }
@@ -56,7 +60,8 @@ export class ReviewsService {
     await review.save();
 
     return {
-      updatedReview: review,
+      review,
+      message: 'Review successfully updated!',
     };
   }
 
@@ -68,7 +73,7 @@ export class ReviewsService {
   }: GetReviewsDto) {
     const reviewsCount = await this.reviewModel.countDocuments();
     const pageTotal = Math.floor((reviewsCount - 1) / limit) + 1;
-
+    const currentPage = Math.floor((skip * limit) / limit) + 1;
     let data;
 
     if (newFirst) {
@@ -92,10 +97,16 @@ export class ReviewsService {
     return {
       data,
       pageTotal,
+      currentPage,
     };
   }
 
   public async getUserReview(reviewId: string) {
+
+    if (!reviewId) {
+      throw new BadRequestException('Provide id!');
+    }
+
     const review = await this.reviewModel.findById(reviewId).populate('user');
 
     if (!review) {

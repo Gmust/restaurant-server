@@ -56,4 +56,12 @@ export class IngredientsController {
   async updateIngredient(@Body() updateIngredientDto: UpdateIngredientDto) {
     return this.ingredientsService.updateIngredient(updateIngredientDto);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Role(Roles.administrator, Roles.cook)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Get('')
+  async getAllIngredients() {
+    return this.ingredientsService.getAllIngredients();
+  }
 }

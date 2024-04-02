@@ -7,13 +7,13 @@ export type IngredientDocument = Ingredient & Document;
 
 @Schema()
 export class Ingredient {
-  @Prop({ type: String, required: [true, 'Ingredient string is required'] })
+  @Prop({ type: String, required: [true, 'Ingredient name is required'] })
   name: string;
 
   @Prop({ type: Number, required: [true, 'Quantity is required'] })
   quantity: number;
 
-  @Prop({ type: String, enum: Object.values(Units), unique: true })
+  @Prop({ type: String, required: [true, 'Unit is required'], enum: Object.values(Units) })
   unit: string;
 }
 

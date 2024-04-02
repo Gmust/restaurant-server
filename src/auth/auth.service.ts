@@ -118,6 +118,7 @@ export class AuthService {
   }
 
   async getUserByToken(token: string) {
+    if (!token) return;
     const parsedTokenData = await this.parseJwt(token);
     const user = await this.userService.findOne(parsedTokenData.user.email);
     return user;

@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 
+import { Ingredient } from '../../schemas/ingredient.schema';
 import { DishCategories } from '../../types/dish';
 
 export class CreateDishDto {
@@ -22,7 +23,7 @@ export class CreateDishDto {
   @Transform(({ value }) => {
     return Array(JSON.parse(value));
   })
-  ingredients: string[];
+  ingredients: any;
 
   @IsNotEmpty()
   @IsBoolean()

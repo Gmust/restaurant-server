@@ -69,7 +69,7 @@ export class ReviewsController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get(':id')
+  @Get('/:id')
   async getUserReview(@Param('id') id: string) {
     try {
       return this.reviewsService.getUserReview(id);
