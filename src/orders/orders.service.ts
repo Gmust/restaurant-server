@@ -12,6 +12,7 @@ import { CartItem } from '../schemas/cartItem.schema';
 import { GuestOrder, GuestOrderDocument } from '../schemas/guestOrder.schema';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { OrderItem } from '../schemas/orderItem.schema';
+import { Statuses } from '../types/order';
 import { UsersService } from '../users/users.service';
 import { bufferPdf } from '../utils/bufferPdf';
 import { CompleteOrderDto } from './dto/complete-order.dto';
@@ -363,7 +364,7 @@ export class OrdersService {
   }
 
   public async deleteAllUnconfirmedOrders() {
-    await this.orderItemModel.deleteMany({ isConfirmed: false });
+    return await this.orderModel.deleteMany({ isConfirmed: false });
   }
 
   public async getUserOrders(userId: string) {
@@ -392,5 +393,22 @@ export class OrdersService {
       throw new BadRequestException('Invalid id!');
     }
     return order;
+  }
+
+  public async getAllOrders() {
+    const orders = await this.orderModel
+      .find({ isConfirmed: true })
+      .populate({
+        path: 'orderItems',
+        populate: {
+          path: 'dish',
+        },
+      })
+      .sort({ created: -1 });
+    return orders;
+  }
+
+  public async deleteAllCompletedOrders() {
+    return await this.orderModel.deleteMany({ status: Statuses.completed });
   }
 }

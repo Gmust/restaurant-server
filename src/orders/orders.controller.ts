@@ -148,10 +148,31 @@ export class OrdersController {
     }
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Role(Roles.administrator, Roles.cook)
+  @UseGuards(RoleGuard)
+  @Get('orders-list')
+  async getAllOrders() {
+    try {
+      return this.orderService.getAllOrders();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  deleteAllUnconfirmedChanges() {
+  deleteAllUnconfirmedOrders() {
     try {
       return this.orderService.deleteAllUnconfirmedOrders();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  deleteAllCompletedOrders() {
+    try {
+      return this.orderService.deleteAllCompletedOrders();
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
