@@ -26,6 +26,7 @@ import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { DeleteOrderDto } from './dto/delete-order.dto';
 import { GetOrderInfoDto } from './dto/get-order-info.dto';
+import { UpdateGuestOrderStatusDto } from './dto/update-guest-order-info.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrdersGateway } from './orders.gateway';
 import { OrdersService } from './orders.service';
@@ -111,13 +112,30 @@ export class OrdersController {
       if (!updateOrderStatusDto) {
         throw new BadRequestException('Something went wrong!');
       }
-      console.log(updateOrderStatus);
       this.ordersGateway.handleStatus({
         orderId: updateOrderStatus.orderId,
         newStatus: updateOrderStatusDto.newStatus,
         userId: updateOrderStatusDto.userId,
       });
       return {
+        ...updateOrderStatus,
+        message: 'Order status successfully updated',
+      };
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Role(Roles.administrator, Roles.cook)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Patch('update-guest-order-status')
+  async updateGuestOrderStatus(@Body() updateGuestOrderStatusDto: UpdateGuestOrderStatusDto) {
+    try {
+      const updatedOrderStatus =
+        await this.orderService.updateGuestOrderStatus(updateGuestOrderStatusDto);
+      return {
+        ...updatedOrderStatus,
         message: 'Order status successfully updated',
       };
     } catch (e) {

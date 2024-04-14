@@ -22,6 +22,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { DeleteOrderDto } from './dto/delete-order.dto';
 import { GenerateOrderDocumentDto } from './dto/generate-order-document.dto';
 import { GetOrderInfoDto } from './dto/get-order-info.dto';
+import { UpdateGuestOrderStatusDto } from './dto/update-guest-order-info.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Injectable()
@@ -77,11 +78,14 @@ export class OrdersService {
 
     if (promoCode) {
       const promoCodeDb = await this.promoCodeService.getPromoCode(promoCode);
-      userCart.totalPrice = userCart.totalPrice * (promoCodeDb.discountValue / 100);
-      await userCart.save({ validateBeforeSave: false });
+      if (!promoCodeDb) {
+        return;
+      } else {
+        userCart.totalPrice = userCart.totalPrice * (promoCodeDb.discountValue / 100);
+        await userCart.save({ validateBeforeSave: false });
+      }
     }
     const orderNumber = this.generateOrderNumber();
-
     const orderDoc = await this.generateOrderDocument({
       email,
       totalPrice: userCart.totalPrice,
@@ -315,14 +319,33 @@ export class OrdersService {
     };
   }
 
+  public async updateGuestOrderStatus({ orderId, newStatus }: UpdateGuestOrderStatusDto) {
+    const guestOrder = await this.guestOrderModel.findById(orderId);
+    if (!guestOrder) {
+      throw new BadRequestException('Invalid order id!');
+    }
+    guestOrder.status = newStatus;
+    guestOrder.save({ validateBeforeSave: false });
+    return {
+      newStatus,
+      orderId,
+    };
+  }
+
   public async completeOrder({ orderId }: CompleteOrderDto) {
     const order = await this.orderModel.findById(orderId);
-    const user = await this.usersService.findById(order.user);
+    const guestOrder = await this.guestOrderModel.findById(orderId);
 
-    user.orders = user.orders.filter(order => String(order.id) == String(orderId));
-    await user.save({ validateBeforeSave: false });
+    if (order) {
+      const user = await this.usersService.findById(order.user);
+      user.orders = user.orders.filter(order => String(order.id) == String(orderId));
+      await user.save({ validateBeforeSave: false });
 
-    await this.orderModel.findByIdAndDelete(orderId);
+      await this.orderModel.findByIdAndDelete(orderId);
+    } else if (guestOrder) {
+      console.log('in guest order');
+      await this.guestOrderModel.deleteOne({ _id: guestOrder._id });
+    }
 
     return {
       message: 'Order Successfully completed!',
@@ -396,7 +419,9 @@ export class OrdersService {
   }
 
   public async getAllOrders() {
-    const orders = await this.orderModel
+    let allOrders = [];
+
+    const usersOrders = await this.orderModel
       .find({ isConfirmed: true })
       .populate({
         path: 'orderItems',
@@ -405,7 +430,20 @@ export class OrdersService {
         },
       })
       .sort({ created: -1 });
-    return orders;
+
+    const guestsOrders = await this.guestOrderModel
+      .find({ isConfirmed: true })
+      .populate({
+        path: 'orderItems',
+        populate: {
+          path: 'dish',
+        },
+      })
+      .sort({ created: -1 });
+
+    allOrders = [...usersOrders, ...guestsOrders];
+
+    return allOrders;
   }
 
   public async deleteAllCompletedOrders() {

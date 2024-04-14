@@ -47,9 +47,7 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('update-order-status')
   handleStatus(@MessageBody() updateOrderStatusDto: UpdateOrderStatusDto): void {
     const { userId } = updateOrderStatusDto;
-    console.log('update-order', userId);
     const userSocket = this.getUserSocket(userId);
-    console.log('user socket', userSocket.id);
     if (userSocket) {
       userSocket.emit('update-order-status', updateOrderStatusDto);
     }
