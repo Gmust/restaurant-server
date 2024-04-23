@@ -15,7 +15,6 @@ export class CreateReservationDto {
   @IsNumber()
   amountOfVisitors: number;
 
-  @IsNumber()
   @IsEmail()
   email: string;
 }

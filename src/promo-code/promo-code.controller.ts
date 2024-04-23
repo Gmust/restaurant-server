@@ -19,7 +19,7 @@ import { Roles } from '../types/user';
 import { CreatePromoDto } from './dto/create-promo.dto';
 import { PromoCodeService } from './promo-code.service';
 
-@Controller('promo-code')
+@Controller('promo-codes')
 @ApiTags('Promo codes')
 export class PromoCodeController {
   constructor(private promoCodeService: PromoCodeService) {}
@@ -33,16 +33,12 @@ export class PromoCodeController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Role(Roles.administrator)
-  @UseGuards(AuthGuard, RoleGuard)
   @Get(':promoCodeId')
   async getPromoCode(@Param() params: { promoCodeId: string }) {
     return this.promoCodeService.getPromoCode(params.promoCodeId);
   }
 
   @HttpCode(HttpStatus.OK)
-  @Role(Roles.administrator)
-  @UseGuards(AuthGuard, RoleGuard)
   @Get('')
   async getAllPromoCodes() {
     return this.promoCodeService.getAllPromoCodes();

@@ -102,7 +102,6 @@ export class ReviewsService {
   }
 
   public async getUserReview(reviewId: string) {
-
     if (!reviewId) {
       throw new BadRequestException('Provide id!');
     }

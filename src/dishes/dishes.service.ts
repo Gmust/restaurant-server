@@ -159,6 +159,7 @@ export class DishesService {
   }
 
   async createSpecialtiesMenu({ specialties }: CreateSpecialtiesDto) {
+    await this.specialtiesModel.deleteMany();
     return this.specialtiesModel.create({ specialtyDishes: specialties });
   }
 
