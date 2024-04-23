@@ -1,3 +1,4 @@
+import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
@@ -7,7 +8,7 @@ export class GetReviewsDto {
     description: 'Limit for reviews per 1 time',
     type: Number,
   })
-  @IsNotEmpty()
+  @IsOptional()
   limit: number;
 
   @ApiProperty({
@@ -15,7 +16,7 @@ export class GetReviewsDto {
     description: 'Skip page',
     type: Number,
   })
-  @IsNotEmpty()
+  @IsOptional()
   skip: number;
 
   @ApiProperty({
