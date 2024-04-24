@@ -26,13 +26,15 @@ export class PaymentsService {
 
   private createLineItems(newOrder: GuestOrderDocument | OrderDocument) {
     return newOrder.orderItems.map((item: any) => {
+      const unitAmountInCents = item.dish.price * 100;
+
       return {
         price_data: {
           currency: 'usd',
           product_data: {
             name: item.dish.name,
           },
-          unit_amount: item.dish.price,
+          unit_amount: unitAmountInCents,
         },
         quantity: item.quantity,
       };

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Order Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #333333;
+    }
+    p {
+      color: #666666;
+      margin-bottom: 20px;
+    }
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Order Confirmation</h1>
+    <p>Thank you for your order! Your order details are attached as a PDF file.</p>
+    <a href="{{process.env.FRONTEND_URL}}/order/order-status?orderNum=ORD1739&email=vp1234512345025@gmail.com" class="button">View Order Details</a>
+  </div>
+</body>
+</html>

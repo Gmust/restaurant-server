@@ -99,8 +99,8 @@ export class OrdersService {
     await this.mailerService.sendMailWithAttachment({
       email,
       document: orderDoc,
-      subject: 'Order',
-      template: 'test-template',
+      subject: 'Order Confirmation',
+      template: 'order-confirmation-template',
     });
 
     const newOrder = await this.orderModel.create({
@@ -266,13 +266,17 @@ export class OrdersService {
       });
 
       if (!guestOrder) {
-        const userOrder = await this.orderModel.findOne({ user: user._id, orderNumber }).populate({
-          path: 'orderItems',
-          populate: {
-            path: 'dish',
-          },
-        });
-
+        const userOrder = await this.orderModel
+          .findOne({ user: user._id, orderNumber })
+          .populate({
+            path: 'user',
+          })
+          .populate({
+            path: 'orderItems',
+            populate: {
+              path: 'dish',
+            },
+          });
         if (!userOrder) {
           throw new BadRequestException('Invalid email or order info');
         }
