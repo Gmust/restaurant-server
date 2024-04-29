@@ -20,7 +20,7 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
   app.use(rawBodyMiddleware());
   app.useStaticAssets(join(__dirname, '../dishes', 'images'));
-  app.enableCors({ origin: 'http://localhost:3000', credentials: true });
+  //app.enableCors({ origin: 'http://localhost:3000', credentials: true });
   app.enableCors({ origin: 'https://restaurant-client-ebon.vercel.app', credentials: true });
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(8080);
