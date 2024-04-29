@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -19,6 +24,10 @@ export class ReviewsService {
     try {
       const user = await this.userService.findById(userId);
       const newReview = await this.reviewModel.create({ rating, reviewComment: comment, user });
+      if (!newReview) {
+        throw new BadRequestException('Someething went wrong');
+      }
+
       user.review = newReview.id;
       await user.save({ validateBeforeSave: false });
 
@@ -27,7 +36,11 @@ export class ReviewsService {
         message: 'New review successfully posted',
       };
     } catch (e) {
-      if (e.code === 11000) throw new ConflictException('User can have only one review');
+      if (e.code === 11000) {
+        throw new ConflictException('User can have only one review');
+      } else {
+        throw new InternalServerErrorException('Something went wrong', e);
+      }
     }
   }
 
@@ -47,13 +60,17 @@ export class ReviewsService {
     const review = await this.reviewModel.findById(reviewId);
 
     if (!review) {
-      throw new BadRequestException('Invalid reveiw id');
+      throw new BadRequestException('Invalid review id');
     }
 
     if (newRating) {
       review.rating = newRating;
     }
+
     if (newComment) {
+      if (newComment.length < 2) {
+        throw new BadRequestException('Comment must contain at least 2 symbols');
+      }
       review.reviewComment = newComment;
     }
 

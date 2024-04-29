@@ -17,7 +17,7 @@ export class Review {
   @Prop({ type: Number, min: 1, max: 5 })
   rating: number;
 
-  @Prop({ type: String, minlength: [5, 'Comment must contain at least 5 symbols'] })
+  @Prop({ type: String, minlength: [2, 'Comment must contain at least 2 symbols'] })
   reviewComment: string;
 }
 
